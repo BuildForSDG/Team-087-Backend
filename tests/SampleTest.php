@@ -2,11 +2,11 @@
 
 use PHPUnit\Framework\TestCase;
 
-class Test extends TestCase
+class SampleTest extends TestCase
 {
     /**
      * @test
-     * @testdox
+     * @testdox SampleTestCase
      */
     public function sampleTestCase()
     {
