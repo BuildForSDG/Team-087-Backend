@@ -9,4 +9,13 @@ class Patient extends Model
     public $timestamps = true;
     public $incrementing = false;
     protected $primaryKey = 'users_id';
+
+    protected $fillable = [
+        'users_id', 'card_no', 'birth_date'
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'users_id');
+    }
 }
