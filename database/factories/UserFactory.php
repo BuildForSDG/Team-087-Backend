@@ -4,6 +4,7 @@
 
 use App\User;
 use Faker\Generator as Faker;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,8 +18,17 @@ use Faker\Generator as Faker;
 */
 
 $factory->define(User::class, function (Faker $faker) {
+    $is_patient = $faker->boolean;
+
     return [
-        'name' => $faker->name,
-        'email' => $faker->email,
+        'last_name' => $faker->lastName,
+        'first_name' => $faker->firstName,
+        'email' => $faker->unique()->safeEmail,
+        'password' => '$2b$10$SmaYmzxefwKVyC3ZJ9j/teM2fUfIPWtw51ptLXRiyEDWbxWoPQOdW', //markspencer
+        'photo' => $faker->imageUrl(150, 120),
+        'is_patient' => $is_patient,
+        'is_specialist' => !$is_patient,
+        'is_guest' => true,
+        'remember_token' => Str::random(15)
     ];
 });
