@@ -14,8 +14,13 @@ class CreatePatientsTable extends Migration
     public function up()
     {
         Schema::create('patients', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->unsignedBigInteger('users_id')->primary();
+            $table->string('card_no', 25);
+            $table->date('birth_date');
+            $table->timestampsTz();
+
+            $table->index('users_id', 'fk_patients_users_idx_1');
+            $table->foreign('users_id', 'fk_patients_users')->references('id')->on('users')->cascadeOnDelete();
         });
     }
 
