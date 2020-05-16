@@ -18,17 +18,22 @@ use Illuminate\Support\Str;
 */
 
 $factory->define(User::class, function (Faker $faker) {
-    $is_patient = $faker->boolean;
+    $isPatient = $faker->boolean;
+    $minimumAge = $isPatient ? 15 : 35;
+    $emailAddress = $faker->unique()->safeEmail;
 
     return [
         'last_name' => $faker->lastName,
         'first_name' => $faker->firstName,
-        'email' => $faker->unique()->safeEmail,
+        'gender' => $faker->randomElement(['male', 'female']),
+        'birth_date' => $faker->dateTimeBetween('-' . random_int($minimumAge, 80) . ' years')->format(('Y-m-d')), //'1970-01-01'
+        'email' => $emailAddress,
         'password' => '$2b$10$SmaYmzxefwKVyC3ZJ9j/teM2fUfIPWtw51ptLXRiyEDWbxWoPQOdW', //markspencer
-        'photo' => $faker->imageUrl(150, 120),
-        'is_patient' => $is_patient,
-        'is_specialist' => !$is_patient,
-        'is_guest' => true,
+        #'photo' => $faker->imageUrl(150, 120),
+        'marital_status' => $faker->randomElement(['single', 'married', 'divorced', 'complicated']),
+        'is_patient' => $isPatient,
+        'is_specialist' => !$isPatient,
+        'profile_code' => hash('sha512', $emailAddress),
         'remember_token' => Str::random(15)
     ];
 });
