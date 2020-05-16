@@ -44,23 +44,24 @@ class AuthController extends Controller
 
 
             $user = new User();
-            $user->last_name = $request->input('last_name');
-            $user->first_name = $request->input('first_name');
-            $user->gender = $request->input('gender');
-            $user->birth_date = $request->input('birth_date');
-            $user->email = $request->input('email');
-            $user->marital_status = $request->input('marital_status', 'single');
-            $user->is_patient = $request->input('is_patient', true);
+            $user->last_name = $request->post('last_name');
+            $user->first_name = $request->post('first_name');
+            $user->gender = $request->post('gender');
+            $user->birth_date = $request->post('birth_date');
+            $user->email = $request->post('email');
+            $user->marital_status = $request->post('marital_status', 'single');
+            $user->is_patient = $request->post('is_patient', true);
             $user->is_specialist = !$user->is_patient;
-            $user->password = $request->input('password'); //app('hash')->make($request->input('password'));
+            $user->password = $request->post('password'); //app('hash')->make($request->input('password'));
             $user->profile_code = hash('sha512', $user->email);
             $user->save();
 
 
             // send mail notification
-            $appName = env('APP_NAME', 'Mh-87');
+            $appName = env('APP_NAME', 'MH-87');
             $verificationUrl = 'http://' . env('APP_FRONTEND_URL') . '/auth/verify?code=' . $user->profile_code . '&email=' . $user->email;
-            @mail($user->email, "[$appName] Welcome on-board!", "Your account has been created on [$appName]. Pls verify with the link provided below.\n\n{$verificationUrl}", []);
+            $statement = "Your account has been created on [$appName]. Pls verify with the link provided below.\n\n{$verificationUrl}";
+            @mail($user->email, "[$appName] Welcome on-board!", $statement, []);
 
             return response()->json(['status' => true, 'message' => 'Profile created successfully', 'data' => $user], 201);
         } catch (ValidationException $e) {
