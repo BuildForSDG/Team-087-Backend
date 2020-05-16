@@ -21,7 +21,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'last_name', 'first_name', 'email', 'phone_number', 'is_patient', 'is_specialist', 'is_guest'
+        'last_name', 'first_name', 'gender', 'birth_date', 'email', 'phone_number', 'marital_status', 
+        'is_patient', 'is_specialist', 'is_guest', 'profile_code'
     ];
 
     /**
@@ -30,8 +31,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'password', 'verified_at', 'verify_code', 'is_specialist', 'is_guest',
-        'remember_token'
+        'password', 'verified_at', 'verify_code', 'is_specialist', 'is_guest', 'is_admin', 'is_active',
+        'remember_token', 'profile_code'
     ];
 
     protected function setPasswordAttribute($password)
