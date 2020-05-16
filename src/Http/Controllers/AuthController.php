@@ -16,7 +16,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['register']]);
+        $this->middleware('auth', ['except' => ['register', 'verify']]);
     }
 
     /**
@@ -68,5 +68,42 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json(['status' => false, 'message' => 'Profile registration failed - ' . $e->getMessage(), 'data' => []], 409);
         }
+    }
+
+    /**
+     * Verify user account
+     */
+    public function verify(Request $request)
+    {
+        $user = User::where(['profile_code' => $request->query('code')])->first();
+        if (empty($user)) {
+            return response()->json([
+                'status' => false, 'message' => 'User verification failed',
+                'errors' => ['code' => 'Verification code is invalid']
+            ], 400);
+        }
+
+        if ($user->email !== $request->query('email')) {
+            return response()->json([
+                'status' => false, 'message' => 'User verification failed',
+                'errors' => ['email' => 'User does not exist']
+            ], 404);
+        }
+
+        if ($user->is_active) {
+            return response()->json([
+                'status' => false, 'message' => 'Invalid request',
+                'errors' => ['user' => 'User has already been verified']
+            ], 400);
+        }
+
+        $user->is_active = true;
+        $user->is_guest = false;
+        $user->profiled_at = date('Y-m-d h:i:s');
+        $user->save();
+
+        return response()->json([
+            'status' => true, 'message' => 'User verification successful', 'data' => $user
+        ]);
     }
 }
