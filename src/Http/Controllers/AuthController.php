@@ -73,6 +73,9 @@ class AuthController extends Controller
 
     /**
      * Verify user account
+     *
+     * @param Request $request
+     * @return Response
      */
     public function verify(Request $request)
     {
