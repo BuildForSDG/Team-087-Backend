@@ -16,7 +16,10 @@ class CreatePatientsTable extends Migration
         Schema::create('patients', function (Blueprint $table) {
             $table->unsignedBigInteger('users_id')->primary();
             $table->string('card_no', 25);
-            $table->date('birth_date');
+            $table->char('blood_group', 3);
+            $table->char('genotype', 3);
+            $table->char('eye_colour', 15)->nullable();
+            $table->char('skin_colour', 15)->nullable();
             $table->timestampsTz();
 
             $table->index('users_id', 'fk_patients_users_idx_1');

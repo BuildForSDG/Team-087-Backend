@@ -19,6 +19,7 @@ class CreateSpecialistsTable extends Migration
             $table->date('licensed_at');
             $table->date('last_renewed_at');
             $table->date('expires_at');
+            $table->boolean('is_verified')->default(false);
             $table->timestampsTz();
 
             $table->index('users_id', 'fk_patients_users_idx_2');
