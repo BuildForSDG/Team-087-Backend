@@ -28,7 +28,7 @@ $factory->define(User::class, function (Faker $faker) {
         'gender' => $faker->randomElement(['male', 'female']),
         'birth_date' => $faker->dateTimeBetween('-' . random_int($minimumAge, 80) . ' years')->format(('Y-m-d')), //'1970-01-01'
         'email' => $emailAddress,
-        'password' => '$2b$10$SmaYmzxefwKVyC3ZJ9j/teM2fUfIPWtw51ptLXRiyEDWbxWoPQOdW', //markspencer
+        'password' => 'markspencer',
         #'photo' => $faker->imageUrl(150, 120),
         'marital_status' => $faker->randomElement(['single', 'married', 'divorced', 'complicated']),
         'is_patient' => $isPatient,

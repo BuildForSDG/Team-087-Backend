@@ -35,7 +35,7 @@ class AuthController extends Controller
                 'gender' => 'required|in:male,female',
                 'email' => 'required|email|unique:users',
                 // 'marital_status' => 'required|in:single,married,divorced,complicated',
-                'password' => 'required|confirmed',
+                'password' => 'required|confirmed|min:8',
                 'is_patient' => 'required|boolean',
             ], [
                 // 'in' => 'The :attribute must be one of the following: :values',
@@ -63,11 +63,17 @@ class AuthController extends Controller
             $statement = "Your account has been created on [$appName]. Pls verify with the link provided below.\n\n{$verificationUrl}";
             @mail($user->email, "[$appName] Welcome on-board!", $statement, []);
 
-            return response()->json(['status' => true, 'message' => 'Profile created successfully', 'data' => $user], 201);
+            return response()->json([
+                'status' => true, 'message' => 'Profile created successfully', 'data' => $user
+            ], 201);
         } catch (ValidationException $e) {
-            return response()->json(['status' => false, 'message' => $e->getMessage(), 'errors' => $e->errors()], 400);
+            return response()->json([
+                'status' => false, 'message' => $e->getMessage(), 'errors' => $e->errors()
+            ], 400);
         } catch (\Exception $e) {
-            return response()->json(['status' => false, 'message' => 'Profile registration failed - ' . $e->getMessage(), 'data' => []], 409);
+            return response()->json([
+                'status' => false, 'message' => 'Profile creation failed', 'errors' => ['error' => $e->getMessage()]
+            ], 409);
         }
     }
 
