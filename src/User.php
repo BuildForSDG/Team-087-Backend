@@ -6,6 +6,7 @@ use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Lumen\Auth\Authorizable;
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract
@@ -20,7 +21,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'name', 'email',
+        'last_name', 'first_name', 'gender', 'birth_date', 'email', 'phone_number', 'marital_status',
+        'is_patient', 'is_specialist', 'is_guest', 'profile_code'
     ];
 
     /**
@@ -29,6 +31,22 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'password',
+        'password', 'verified_at', 'verify_code', 'is_specialist', 'is_guest', 'is_admin', 'is_active',
+        'remember_token', 'profile_code'
     ];
+
+    protected function setPasswordAttribute($password)
+    {
+        $this->attributes['password'] = Hash::needsRehash($password) ? Hash::make($password) : $password;
+    }
+
+    public function patient()
+    {
+        return $this->hasOne(Patient::class, 'users_id');
+    }
+
+    public function specialist()
+    {
+        return $this->hasOne(Specialist::class, 'users_id');
+    }
 }
