@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserRegisteredEvent;
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -58,10 +58,7 @@ class AuthController extends Controller
 
 
             // send mail notification
-            $appName = env('APP_NAME', 'MH-87');
-            $verificationUrl = 'http://' . env('APP_FRONTEND_URL') . '/auth/verify?code=' . $user->profile_code . '&email=' . $user->email;
-            $statement = "Your account has been created on [$appName]. Pls verify with the link provided below.\n\n{$verificationUrl}";
-            @mail($user->email, "[$appName] Welcome on-board!", $statement, []);
+            event(new UserRegisteredEvent($user));
 
             return response()->json([
                 'status' => true, 'message' => 'Profile created successfully', 'data' => $user
