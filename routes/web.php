@@ -1,5 +1,7 @@
 <?php
 
+/** @var \Laravel\Lumen\Routing\Router $router */
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -12,8 +14,10 @@
 */
 
 $router->group(['prefix' => 'api/v1'], function () use ($router) {
-    $router->post('auth/register', ['uses' => 'AuthController@register', 'as' => 'auth.register']);
-    $router->get('auth/verify', ['uses' => 'AuthController@verify', 'as' => 'auth.verify']);
+    $router->group(['prefix' => 'auth'], function () use ($router) {
+        $router->post('register', ['uses' => 'AuthController@register', 'as' => 'auth.register']);
+        $router->get('verify', ['uses' => 'AuthController@verify', 'as' => 'auth.verify']);
+    });
 });
 
 $router->get('/', function () use ($router) {
