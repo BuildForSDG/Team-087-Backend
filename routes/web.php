@@ -17,6 +17,11 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->group(['prefix' => 'auth'], function () use ($router) {
         $router->post('register', ['uses' => 'AuthController@register', 'as' => 'auth.register']);
         $router->get('verify', ['uses' => 'AuthController@verify', 'as' => 'auth.verify']);
+
+        $router->post('signin', ['uses' => 'AuthController@signin', 'as' => 'auth.signin']);
+        $router->post('refresh', ['uses' => 'AuthController@refresh', 'as' => 'auth.refresh']);
+        $router->post('me', ['uses' => 'AuthController@me', 'as' => 'auth.me']);
+        $router->post('signout', ['uses' => 'AuthController@signout', 'as' => 'auth.signout']);
     });
 });
 
