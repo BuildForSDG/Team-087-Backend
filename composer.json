@@ -14,8 +14,9 @@
     "tymon/jwt-auth": "^1.0"
   },
   "scripts": {
-    "test": "phpunit",
-    "php-cs-fixer": "php-cs-fixer fix ./",
+    "test": "phpunit --colors=always",
+    "test:ci": "composer test -- --verbose --coverage-text --coverage-clover=coverage.xml",
+    "php-cs-fixer": "php-cs-fixer fix ./ --verbose",
     "post-root-package-install": [
         "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
     ]
