@@ -36,11 +36,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'remember_token', 'profile_code'
     ];
 
-    protected function setPasswordAttribute($password)
-    {
-        $this->attributes['password'] = Hash::needsRehash($password) ? Hash::make($password) : $password;
-    }
-
     public function patient()
     {
         return $this->hasOne(Patient::class, 'users_id');
@@ -69,5 +64,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    protected function setPasswordAttribute($password)
+    {
+        $this->attributes['password'] = Hash::needsRehash($password) ? Hash::make($password) : $password;
     }
 }

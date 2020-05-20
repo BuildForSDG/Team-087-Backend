@@ -29,7 +29,7 @@ $factory->define(User::class, function (Faker $faker) {
         'birth_date' => $faker->dateTimeBetween('-' . random_int($minimumAge, 80) . ' years')->format(('Y-m-d')), //'1970-01-01'
         'email' => $emailAddress,
         'password' => 'markspencer',
-        #'photo' => $faker->imageUrl(150, 120),
+        //'photo' => $faker->imageUrl(150, 120),
         'marital_status' => $faker->randomElement(['single', 'married', 'divorced', 'complicated']),
         'is_patient' => $isPatient,
         'is_specialist' => !$isPatient,
