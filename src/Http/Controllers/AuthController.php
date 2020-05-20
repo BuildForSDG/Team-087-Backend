@@ -16,7 +16,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['register', 'verify']]);
+        $this->middleware('auth', ['only' => ['signout', 'me', 'refresh']]);
     }
 
     /**
@@ -111,6 +111,81 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => true, 'message' => 'User verification successful', 'data' => $user
+        ]);
+    }
+
+    /**
+     * Get a JWT via given credentials.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function signin(Request $request)
+    {
+        try {
+            $this->validate($request, ['email' => 'required|email|exists:users', 'password' => 'required|min:8']);
+
+            $credentials = array_merge($request->only(['email', 'password']), ['is_active' => true]);
+            if (!($token = auth()->attempt($credentials))) {
+                return response()->json([
+                    'status' => false, 'message' => 'Authentication failed', 'errors' => ['error' => 'Invalid email-address/password']
+                ], 401);
+            }
+
+            return $this->respondWithToken($token);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => false, 'message' => 'Authentication failed', 'errors' => $e->errors()
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false, 'message' => 'Authentication failed', 'errors' => ['error' => $e->getMessage()]
+            ], 400);
+        }
+    }
+
+    /**
+     * Get the authenticated User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function me()
+    {
+        return response()->json(['status' => true, 'data' => auth()->user()]);
+    }
+
+    /**
+     * Log the user out (Invalidate the token).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function signout()
+    {
+        auth()->guard()->logout();
+        return response()->json(['status' => true, 'message' => 'Signed out successfully']);
+    }
+
+    /**
+     * Refresh a token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->guard()->refresh());
+    }
+
+    /**
+     * Get the token array structure.
+     *
+     * @param  string $token
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'status' => true, 'data' => auth()->user(), 'access_token' => $token, 'token_type' => 'bearer',
+            'expires_in' => auth()->guard()->factory()->getTTL() * 60
         ]);
     }
 }
