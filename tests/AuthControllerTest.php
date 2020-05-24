@@ -200,9 +200,7 @@ class AuthControllerTest extends TestCase
     {
         $this->get('/')->assertResponseStatus(200);
     
-        $user = User::where(['is_active' => true, 'is_guest' => false])->first();
         $this->post($this->apiV1SignOutUrl);
-    
         $this->seeStatusCode(401)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message']);
     }
 }

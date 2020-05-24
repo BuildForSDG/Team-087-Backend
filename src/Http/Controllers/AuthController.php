@@ -149,7 +149,7 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function me()
+    public function moi()
     {
         return response()->json(['status' => true, 'data' => auth()->user()]);
     }

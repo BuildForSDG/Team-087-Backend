@@ -20,7 +20,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         $router->post('signin', ['uses' => 'AuthController@signin', 'as' => 'auth.signin']);
         $router->post('refresh', ['uses' => 'AuthController@refresh', 'as' => 'auth.refresh']);
-        $router->post('me', ['uses' => 'AuthController@me', 'as' => 'auth.me']);
+        $router->post('me', ['uses' => 'AuthController@moi', 'as' => 'auth.moi']);
         $router->post('signout', ['uses' => 'AuthController@signout', 'as' => 'auth.signout']);
     });
 });
