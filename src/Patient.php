@@ -11,7 +11,7 @@ class Patient extends Model
     protected $primaryKey = 'users_id';
 
     protected $fillable = [
-        'users_id', 'card_no', 'birth_date'
+        'users_id', 'card_no', 'blood_group', 'genotype', 'eye_colour', 'skin_colour'
     ];
 
     public function user()

@@ -14,6 +14,8 @@ class AuthControllerTest extends TestCase
 
     private $apiV1RegisterUrl;
     private $apiV1VerifyUrl;
+    private $apiV1SignInUrl;
+    private $apiV1SignOutUrl;
 
     protected function setUp(): void
     {
@@ -23,6 +25,8 @@ class AuthControllerTest extends TestCase
 
         $this->apiV1RegisterUrl = $this->apiV1 . '/auth/register';
         $this->apiV1VerifyUrl = $this->apiV1 . '/auth/verify';
+        $this->apiV1SignInUrl = $this->apiV1 . '/auth/signin';
+        $this->apiV1SignOutUrl = $this->apiV1 . '/auth/signout';
     }
 
     /**
@@ -123,5 +127,80 @@ class AuthControllerTest extends TestCase
         $user = factory(User::class)->create(['is_active' => true, 'is_guest' => false]);
         $this->get("{$this->apiV1VerifyUrl}?code={$user->profile_code}&email={$user->email}")->assertResponseStatus(400);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+    }
+
+    /**
+     * Should not be granted access with invalid signin-credentials
+     *
+     * @return void
+     */
+    public function testUserCannotSignInWithInvalidEmailAddressAndPassword()
+    {
+        $this->get('/')->assertResponseStatus(200);
+
+        $this->post($this->apiV1SignInUrl, ['email' => 'randomuser@test.com', 'password' => 'passw0rd']);
+        $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])
+            ->seeJsonDoesntContains(['data']);
+    }
+
+    /**
+     * Should only be granted access with valid/verified signin-credentials
+     *
+     * @return void
+     */
+    public function testUserCanOnlyBeAuthenticatedWithVerifiedEmailAddressAndPassword()
+    {
+        $this->get('/')->assertResponseStatus(200);
+
+        $user = factory(User::class)->create(['is_active' => true, 'is_guest' => false]);
+        $this->post($this->apiV1SignInUrl, ['email' => $user->email, 'password' => 'markspencer']);
+
+        $this->seeStatusCode(200)->seeJson(['status' => true])
+            ->seeJsonStructure(['data' => ['id', 'email'], 'access_token', 'token_type', 'expires_in'])->seeJsonDoesntContains(['errors']);
+    }
+
+    /**
+     * Should not be granted access with UNVERIFIED but valid signin-credentials
+     *
+     * @return void
+     */
+    public function testUserCannotSigninWithUnverifiedButValidEmailAddressAndPassword()
+    {
+        $this->get('/')->assertResponseStatus(200);
+
+        $this->post($this->apiV1SignInUrl, ['email' => factory(User::class)->create()->email, 'password' => 'markspencer']);
+        $this->seeStatusCode(401)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])
+            ->seeJsonDoesntContains(['data']);
+    }
+
+    /**
+     * Should not be able to sign-out after being authenticated
+     *
+     * @return void
+     */
+    public function testUserCanSignoutAfterBeingAuthenticated()
+    {
+        $this->get('/')->assertResponseStatus(200);
+    
+        $user = factory(User::class)->create(['is_active' => true, 'is_guest' => false]);
+        $this->post($this->apiV1SignInUrl, ['email' => $user->email, 'password' => 'markspencer']);
+        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['access_token']);
+    
+        $response = json_decode($this->response->getContent());
+        $this->actingAs($user)->post($this->apiV1SignOutUrl, [], ['Authorization' => "Bearer {$response->access_token}"]);
+        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['message']);
+    }
+    
+    /**
+     * Should not be able to sign-out if not authenticated
+     *
+     * @return void
+     */
+    public function testUserCannotSignoutIfNotAuthenticated()
+    {
+        $this->get('/')->assertResponseStatus(200);
+    
+        $this->post($this->apiV1SignOutUrl);
+        $this->seeStatusCode(401)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message']);
     }
 }
