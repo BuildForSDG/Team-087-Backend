@@ -35,6 +35,8 @@ The link to this project's postman collection will be provided at the end of the
 - Clone/Download the project and set it up in the document-root of the local server in your PC
 - Run `composer install` to install all the application's composer dependencies
 - Run `composer dump-autoload` to get all your application's classes aggregated into a class-map for easy referencing
+- Set random characters to the `APP_KEY` environment variable
+- Run `php artisan jwt:secret` for generation of the `JWT-SECRET` value
 - Start your local server running Apache and Postgresql as the database
 - Create a database and set its name to the value of the `DB_DATABASE` in your `.env` file within your project's root
 - Run `php artisan migrate` to setup the tables used by the app within the database you just created. Additionally, if you will like to have sample data in the tables, you may run the append the `--seed` flag like so `php artisan migrate --seed`.
