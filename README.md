@@ -30,8 +30,8 @@ In the midst of a pandemic such as we have around the world today with the **`CO
 
 <!-- How would someone use what you have built, include URLs to the deployed app, service e.t.c when you have it setup -->
 
-This backend project can be accessed via https://mental-ly.herokuapp.com.<br>
-The counterpart frontend project can be accessed via https://mental-lyf.herokuapp.com.<br>
+This backend project can be accessed via <https://mental-ly.herokuapp.com>.<br>
+The counterpart frontend project can be accessed via <https://mental-lyf.herokuapp.com>.<br>
 The link to this project's postman collection will be provided at the end of the on-going development phase.
 <br><br>
 
@@ -40,15 +40,10 @@ The link to this project's postman collection will be provided at the end of the
 <!-- The `index.php` is the entry to the project and source code should go into the `src` folder. All tests should be written in the test folder. -->
 
 -   Clone/Download the project and set it up in the document-root of the local server in your PC
-
 -   Run `composer install` to install all the application's composer dependencies
-
 -   Run `composer dump-autoload` to get all the application's classes aggregated into a class-map for easy referencing
-
 -   Set random characters to the `APP_KEY` environment variable
-
 -   Run `php artisan jwt:secret` for generation of the **`JWT-SECRET`** value
-
 -   Voila! The app's services are all setup locally!
 
 **Note:** _*(In order to enjoy the functionalities in this project, kindly follow the instructions on its accompanying [frontend](https://github.com/BuildForSDG/Team-087-Frontend) project to setup the UI.*_
@@ -93,11 +88,11 @@ The link to this project's postman collection will be provided at the end of the
 ## Contributing
 
 If this project sounds interesting to you and you'd like to contribute, thank you!
-First, you can send a mail to buildforsdg@andela.com to indicate your interest, why you'd like to support and what forms of support you can bring to the table, but here are areas we think we'd need the most help in this project :
+First, you can send a mail to <buildforsdg@andela.com> to indicate your interest, why you'd like to support and what forms of support you can bring to the table, but here are areas we think we'd need the most help in this project :
 
 1.  area one (e.g this app is about `mental-health patients` and the `specialists`/service-providers in this health-sector and you need feedback on your roadmap and feature list from the private sector / NGOs)
 
-2.  area two (e.g you want people to opt-in and try using your staging app at https://mental-ly.herokuapp.com and report any bugs via a form)
+2.  area two (e.g you want people to opt-in and try using your staging app at <https://mental-ly.herokuapp.com> and report any bugs via a form)
 
 3.  area three (e.g here is the zoom link to our end-of sprint webinar, join and provide feedback as a stakeholder if you can)
     <br><br>

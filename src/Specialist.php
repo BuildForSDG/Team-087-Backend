@@ -4,18 +4,36 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Mental-Health Specialist Model (Psychiatrists, Psychologists, e.t.c)
+ * 
+ * @property string $license_no
+ * @property \DateTime $license_at
+ * @property \DateTime $last_renewed_at
+ * @property \DateTime $expires_at
+ */
 class Specialist extends Model
 {
-    public $timestamps = true;
     public $incrementing = false;
-    protected $primaryKey = 'users_id';
+    protected $primaryKey = 'user_id';
 
     protected $fillable = [
-        'users_id', 'license_no', 'licensed_at', 'last_renewed_at', 'expires_at',
+        'user_id', 'license_no', 'licensed_at', 'last_renewed_at', 'expires_at',
     ];
+
+    protected $dates = [
+        'licensed_at', 'last_renewed_at', 'expires_at'
+    ];
+
+    protected $hidden = ['user_id'];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'users_id');
+        return $this->belongsTo(User::class);
+    }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'specialist_id');
     }
 }
