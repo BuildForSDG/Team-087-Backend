@@ -33,4 +33,9 @@ class Patient extends Model
     {
         return $this->hasMany(Appointment::class, 'patient_id');
     }
+
+    public function visits()
+    {
+        return $this->hasManyThrough(Visit::class, Appointment::class, 'patient_id', 'appointment_id', 'user_id');
+    }
 }
