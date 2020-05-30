@@ -9,8 +9,8 @@ use Faker\Generator as Faker;
 
 $factory->define(Review::class, function (Faker $faker) {
     return [
-        'specialist_id' => $faker->randomElement(Specialist::pluck('users_id')->toArray()),
-        'patient_id' => $faker->randomElement(Patient::pluck('users_id')->toArray()),
+        'specialist_id' => $faker->randomElement(Specialist::pluck('user_id')->toArray()),
+        'patient_id' => $faker->randomElement(Patient::pluck('user_id')->toArray()),
         'remark' => 'You are doing well.... Ooin',
         'rating' => '2.0'
     ];
