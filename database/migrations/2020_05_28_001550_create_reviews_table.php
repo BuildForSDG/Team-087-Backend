@@ -15,8 +15,8 @@ class CreateReviewsTable extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('specialist_id')->constrained('specialists', 'users_id');
-            $table->foreignId('patient_id')->constrained('patients', 'users_id');
+            $table->foreignId('specialist_id')->constrained('specialists', 'user_id');
+            $table->foreignId('patient_id')->constrained('patients', 'user_id');
             $table->string('remark', 160);
             $table->unsignedDecimal('rating', 3, 1)->default(0.0); //5.0
             $table->timestampsTz();
