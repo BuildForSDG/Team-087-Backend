@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Specialist extends Model
 {
-    public $timestamps = true;
     public $incrementing = false;
     protected $primaryKey = 'users_id';
 
@@ -17,5 +16,10 @@ class Specialist extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'users_id');
+    }
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class);
     }
 }

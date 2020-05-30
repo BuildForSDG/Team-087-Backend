@@ -14,8 +14,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 {
     use Authenticatable, Authorizable;
 
-    public $timestamps = true;
-
     /**
      * The attributes that are mass assignable.
      *
@@ -36,6 +34,17 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'remember_token', 'profile_code'
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_patient' => 'boolean',
+        'is_specialist' => 'boolean',
+        'is_admin' => 'boolean',
+    ];
+
     public function patient()
     {
         return $this->hasOne(Patient::class, 'users_id');
@@ -44,6 +53,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public function specialist()
     {
         return $this->hasOne(Specialist::class, 'users_id');
+    }
+
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class)->using(GroupMember::class)->as('member')->withTimestamps();
     }
 
     /**
