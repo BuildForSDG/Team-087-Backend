@@ -10,6 +10,8 @@ class Review extends Model
         'specialist_id', 'patient_id', 'remark', 'rating'
     ];
 
+    protected $hidden = ['specialist_id', 'patient_id'];
+
     public function specialist()
     {
         return $this->belongsTo(Specialist::class);

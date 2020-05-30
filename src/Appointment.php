@@ -10,9 +10,9 @@ class Appointment extends Model
         'specialist_id', 'patient_id', 'purpose', 'starts_at', 'ends_at', 'status', 'reason'
     ];
 
-    protected $dates = [
-        'starts_at', 'ends_at'
-    ];
+    protected $hidden = ['specialist_id', 'patient_id'];
+
+    protected $dates = ['starts_at', 'ends_at'];
 
     public function specialist()
     {

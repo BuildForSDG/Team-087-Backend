@@ -43,16 +43,18 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'is_patient' => 'boolean',
         'is_specialist' => 'boolean',
         'is_admin' => 'boolean',
+        'is_active' => 'boolean',
+        'is_guest' => 'boolean',
     ];
 
     public function patient()
     {
-        return $this->hasOne(Patient::class, 'users_id');
+        return $this->hasOne(Patient::class);
     }
 
     public function specialist()
     {
-        return $this->hasOne(Specialist::class, 'users_id');
+        return $this->hasOne(Specialist::class);
     }
 
     public function groups()
