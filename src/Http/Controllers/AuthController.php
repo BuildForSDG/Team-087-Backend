@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Events\UserRegisteredEvent;
+use App\Patient;
+use App\Specialist;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -102,6 +104,11 @@ class AuthController extends Controller
                 'status' => false, 'message' => 'Invalid request',
                 'errors' => ['user' => 'User has already been verified']
             ], 400);
+        }
+
+        if ($user->is_patient) {
+            $patient = factory(Patient::class)->create(['user_id' => $user->id]);
+            $user->card_no = $patient->card_no;
         }
 
         $user->is_active = true;
