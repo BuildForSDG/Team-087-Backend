@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Events\UserRegisteredEvent;
 use App\Patient;
-use App\Specialist;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
