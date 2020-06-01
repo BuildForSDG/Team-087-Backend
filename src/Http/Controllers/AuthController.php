@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Events\UserRegisteredEvent;
 use App\Patient;
-use App\Specialist;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Authentication Controller
+ * 
+ * @author Emma NWAMAIFE <emadimabua@gmail.com>
+ */
 class AuthController extends Controller
 {
     /**
@@ -107,8 +111,7 @@ class AuthController extends Controller
         }
 
         if ($user->is_patient) {
-            $patient = factory(Patient::class)->create(['user_id' => $user->id]);
-            $user->card_no = $patient->card_no;
+            factory(Patient::class)->create(['user_id' => $user->id]);
         }
 
         $user->is_active = true;

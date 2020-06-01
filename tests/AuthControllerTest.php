@@ -1,32 +1,26 @@
 <?php
 
 use App\User;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
 /**
+ * Auth Controller Test
  * @covers App\Http\AuthController
+ * 
+ * @author Emma NWAMAIFE <emadimabua@gmail.com>
  * @uses App\User
  */
 class AuthControllerTest extends TestCase
 {
-    use DatabaseMigrations;
-
     private $apiV1RegisterUrl;
     private $apiV1VerifyUrl;
-    private $apiV1SignInUrl;
-    private $apiV1SignOutUrl;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->artisan('db:seed --class=UsersTableSeeder');
-        $this->withoutEvents();
 
         $this->apiV1RegisterUrl = $this->apiV1 . '/auth/register';
         $this->apiV1VerifyUrl = $this->apiV1 . '/auth/verify';
-        $this->apiV1SignInUrl = $this->apiV1 . '/auth/signin';
-        $this->apiV1SignOutUrl = $this->apiV1 . '/auth/signout';
     }
 
     /**
@@ -181,16 +175,16 @@ class AuthControllerTest extends TestCase
     public function testUserCanSignoutAfterBeingAuthenticated()
     {
         $this->get('/')->assertResponseStatus(200);
-    
+
         $user = factory(User::class)->create(['is_active' => true, 'is_guest' => false]);
         $this->post($this->apiV1SignInUrl, ['email' => $user->email, 'password' => 'markspencer']);
         $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['access_token']);
-    
+
         $response = json_decode($this->response->getContent());
         $this->actingAs($user)->post($this->apiV1SignOutUrl, [], ['Authorization' => "Bearer {$response->access_token}"]);
         $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['message']);
     }
-    
+
     /**
      * Should not be able to sign-out if not authenticated
      *
@@ -199,7 +193,7 @@ class AuthControllerTest extends TestCase
     public function testUserCannotSignoutIfNotAuthenticated()
     {
         $this->get('/')->assertResponseStatus(200);
-    
+
         $this->post($this->apiV1SignOutUrl);
         $this->seeStatusCode(401)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message']);
     }
