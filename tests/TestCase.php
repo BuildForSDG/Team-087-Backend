@@ -36,4 +36,13 @@ abstract class TestCase extends BaseTestCase
     {
         return require __DIR__ . '/../bootstrap/app.php';
     }
+
+    protected function get_user_with_authorization($condition = [])
+    {
+        $user = factory(User::class)->create(array_merge(['is_active' => true, 'is_guest' => false], $condition));
+        $this->post($this->apiV1SignInUrl, ['email' => $user->email, 'password' => 'markspencer']);
+        $response = json_decode($this->response->getContent());
+
+        return ['user' => $user, 'authorization' => ["Authorization" => "Bearer {$response->access_token}"]];
+    }
 }
