@@ -1,10 +1,31 @@
 <?php
 
+use App\User;
+use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
+    use DatabaseMigrations;
+
     protected $apiV1 = '/api/v1';
+
+    protected $apiV1UsersUrl;
+    protected $apiV1SignInUrl;
+    protected $apiV1SignOutUrl;
+    protected $userWithAuthorization;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->artisan('db:seed --class=UsersTableSeeder');
+        $this->withoutEvents();
+
+        $this->apiV1SignInUrl = $this->apiV1 . '/auth/signin';
+        $this->apiV1SignOutUrl = $this->apiV1 . '/auth/signout';
+
+        $this->apiV1UsersUrl = $this->apiV1 . '/users';
+    }
 
     /**
      * Creates the application.
@@ -13,6 +34,6 @@ abstract class TestCase extends BaseTestCase
      */
     public function createApplication()
     {
-        return require __DIR__.'/../bootstrap/app.php';
+        return require __DIR__ . '/../bootstrap/app.php';
     }
 }
