@@ -1,5 +1,6 @@
 <?php
 
+use App\Patient;
 use App\Review;
 use App\Specialist;
 use App\User;
@@ -106,5 +107,51 @@ class ReviewControllerTest extends TestCase
         $nonPatient = factory(User::class)->make(['is_patient' => false]);
         $this->actingAs($nonPatient)->post($url, $review, $this->userWithAuthorization['authorization']);
         $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+    }
+
+    public function testReviewCannotBeEditedByADifferentAuthor()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $specialist_user_id = Specialist::first()->user_id;
+        $url = str_replace(':id', $specialist_user_id, $this->apiV1ReviewsUrl);
+
+        $anotherPatient = factory(Patient::class)->create(['user_id' => factory(User::class)->create(['is_patient' => true])->id]);
+        $review = factory(Review::class)->create([
+            'specialist_id' => $specialist_user_id, 'patient_id' => $anotherPatient->user->id
+        ]);
+
+        $this->actingAs($this->userWithAuthorization['user'])->put("{$url}/{$review->id}", $review->toArray());
+        $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+    }
+
+    public function testReviewCannotBeUpdatedByWithBlankRemark()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $specialist_user_id = Specialist::first()->user_id;
+        $url = str_replace(':id', $specialist_user_id, $this->apiV1ReviewsUrl);
+
+        $review = factory(Review::class)->create(['specialist_id' => $specialist_user_id, 'patient_id' => $this->userWithAuthorization['user']->id]);
+        $review->remark = '';
+
+        $this->actingAs($this->userWithAuthorization['user'])->put("{$url}/{$review->id}", $review->toArray());
+        $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+    }
+
+    public function testReviewCanOnlyBeEditedByItsOriginalAuthor()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $specialist_user_id = Specialist::first()->user_id;
+        $url = str_replace(':id', $specialist_user_id, $this->apiV1ReviewsUrl);
+
+        $review = factory(Review::class)->create(['specialist_id' => $specialist_user_id, 'patient_id' => $this->userWithAuthorization['user']->id]);
+        $review->remark = "{$review->remark}-x";
+
+        $this->actingAs($this->userWithAuthorization['user'])->put("{$url}/{$review->id}", $review->toArray());
+        $this->seeStatusCode(200)->seeJson(['status' => true])->seeInDatabase('reviews', [
+            'specialist_id' => $specialist_user_id, 'remark' => $review['remark']
+        ])->seeJsonStructure(['data' => ['id', 'remark', 'updated_at'], 'message'])->seeJsonDoesntContains(['errors']);
     }
 }
