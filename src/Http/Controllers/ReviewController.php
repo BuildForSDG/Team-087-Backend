@@ -93,4 +93,22 @@ class ReviewController extends Controller
             ], ($e instanceof ModelNotFoundException ? 404 : 400));
         }
     }
+
+    public function view($id)
+    {
+        try {
+            $user = auth()->user();
+            $specialistId = ($user->is_specialist) ? $user->id : $id;
+
+            $reviews = Review::where(['specialist_id' => $specialistId])->get();
+            return response()->json([
+                'status' => true, 'data' => $reviews
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false, 'message' => 'Review(s) could not be fetched',
+                'errors' => ['error' => $e->getMessage()]
+            ], 400);
+        }
+    }
 }

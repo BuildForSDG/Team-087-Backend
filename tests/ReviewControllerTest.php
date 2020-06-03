@@ -122,7 +122,7 @@ class ReviewControllerTest extends TestCase
         $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
-    public function testReviewCannotBeUpdatedByWithBlankRemark()
+    public function testReviewCannotBeUpdatedWithBlankRemark()
     {
         $this->get('/')->assertResponseOk();
 
@@ -150,5 +150,47 @@ class ReviewControllerTest extends TestCase
         $this->seeStatusCode(200)->seeJson(['status' => true])->seeInDatabase('reviews', [
             'specialist_id' => $specialist_user_id, 'remark' => $review['remark']
         ])->seeJsonStructure(['data' => ['id', 'remark', 'updated_at'], 'message'])->seeJsonDoesntContains(['errors']);
+    }
+
+    public function testSpecialistCannotViewReviewsOfAnotherSpecialist()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $specialistUserId = Specialist::first()->user_id;
+        $url = str_replace(':id', $specialistUserId, $this->apiV1ReviewsUrl);
+        $specialist = $this->get_user_with_authorization(['is_specialist' => true]);
+
+        $anotherSpecialist = factory(Specialist::class)->create(['user_id' => factory(User::class)->create(['is_specialist' => true])->id]);
+        factory(Review::class)->create(['specialist_id' => $anotherSpecialist->user_id, 'patient_id' => $this->userWithAuthorization['user']->id]);
+
+        $this->actingAs($specialist['user'])->get($url);
+        $this->seeStatusCode(200)->seeJson(['status' => true, 'data' => []])->seeJsonDoesntContains(['errors']);
+    }
+
+    public function testSpecialistCanOnlyViewTheirPersonalReviews()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $specialist = $this->get_user_with_authorization(['is_specialist' => true]);
+        factory(Review::class)->create(['specialist_id' => $specialist['user']->id, 'patient_id' => $this->userWithAuthorization['user']->id]);
+
+        $url = str_replace(':id', $specialist['user']->id, $this->apiV1ReviewsUrl);
+        $this->actingAs($specialist['user'])->get($url);
+        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonDoesntContains(['errors']);
+    }
+
+    public function testReviewsCanBeViewedByAnyNonSpecialist()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $specialistUserId = Specialist::first()->user_id;
+        $url = str_replace(':id', $specialistUserId, $this->apiV1ReviewsUrl);
+        $patient = $this->get_user_with_authorization(['is_patient' => true]);
+
+        $specialistUserId = Specialist::first()->user_id;
+        factory(Review::class)->create(['specialist_id' => $specialistUserId, 'patient_id' => $patient['user']->id]);
+
+        $this->actingAs($this->userWithAuthorization['user'])->get($url);
+        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['data' => [['id', 'remark', 'rating']]])->seeJsonDoesntContains(['errors']);
     }
 }

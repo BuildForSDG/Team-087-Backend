@@ -52,7 +52,6 @@ The link to this project's postman collection will be provided at the end of the
 ## Running the application
 
 -   Start your local server running Apache/Nginx and Postgresql as the database-server
-
 -   Create a **database** and set its name to the value of the **`DB_DATABASE`** in your **`.env`** file within your project's root. (**_This is done on first-run ONLY_**)
 
 -   Run **`php artisan migrate`** to setup the tables used by the app within the database you just created. Additionally, if you will like to have sample data in the tables, you may append the `--seed` flag like so **`php artisan migrate --seed`**. (**_This is done on first-run ONLY_**)
