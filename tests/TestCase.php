@@ -1,5 +1,7 @@
 <?php
 
+use App\Patient;
+use App\Specialist;
 use App\User;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\TestCase as BaseTestCase;
@@ -40,9 +42,11 @@ abstract class TestCase extends BaseTestCase
     protected function get_user_with_authorization($condition = [])
     {
         $user = factory(User::class)->create(array_merge(['is_active' => true, 'is_guest' => false], $condition));
-        $this->post($this->apiV1SignInUrl, ['email' => $user->email, 'password' => 'markspencer']);
-        $response = json_decode($this->response->getContent());
 
-        return ['user' => $user, 'authorization' => ["Authorization" => "Bearer {$response->access_token}"]];
+        if ($user->is_patient || $user->is_specialist) {
+            factory($user->is_patient ? Patient::class : Specialist::class)->create(['user_id' => $user->id]);
+        }
+
+        return ['user' => $user];
     }
 }

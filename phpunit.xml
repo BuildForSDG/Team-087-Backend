@@ -15,6 +15,8 @@
         <testsuite name="Test Suite">
             <directory suffix=".php">./tests</directory>
             <exclude>./tests/TestCase.php</exclude>
+            <exclude>./tests/ExampleTest.php</exclude>
+            <exclude>./tests/SampleTest.php</exclude>
         </testsuite>
     </testsuites>
     <filter>
@@ -28,6 +30,7 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_FOREIGN_KEYS" value="true"/>
         <env name="DB_DATABASE" value=":memory:"/>
     </php>
 </phpunit>
