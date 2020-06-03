@@ -14,11 +14,11 @@ class Review extends Model
 
     public function specialist()
     {
-        return $this->belongsTo(Specialist::class);
+        return $this->belongsTo(Specialist::class, 'specialist_id');
     }
 
     public function patient()
     {
-        return $this->belongsTo(Patient::class);
+        return $this->belongsTo(Patient::class, 'patient_id');
     }
 }
