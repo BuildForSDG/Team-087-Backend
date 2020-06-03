@@ -28,6 +28,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->group(['prefix' => '{id}'], function () use ($router) {
             $router->post('reviews', ['uses' => 'ReviewController@add', 'as' => 'review.add']);
             $router->put('reviews/{reviewId}', ['uses' => 'ReviewController@edit', 'as' => 'review.edit']);
+            $router->get('reviews', ['uses' => 'ReviewController@view', 'as' => 'review.view']);
         });
     });
 });
