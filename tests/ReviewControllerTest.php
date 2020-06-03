@@ -31,6 +31,7 @@ class ReviewControllerTest extends TestCase
     }
 
     /**
+     * TODO: add proper test for non-existing specialist
      * @return void
      */
     public function testReviewCannotBeAddedForANonSpecialist()
@@ -40,7 +41,7 @@ class ReviewControllerTest extends TestCase
         $url = str_replace(':id', 0, $this->apiV1ReviewsUrl);
         $review = factory(Review::class)->make()->toArray();
 
-        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review)->seeStatusCode(400);
+        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review)->seeStatusCode(404);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
