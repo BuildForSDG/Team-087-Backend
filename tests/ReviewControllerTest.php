@@ -22,17 +22,13 @@ class ReviewControllerTest extends TestCase
         $this->userWithAuthorization = $this->get_user_with_authorization(['is_patient' => true]);
     }
 
-    // public function testUserCannotAddReviewIfNotAuthenticated()
-    // {
-    //     $this->get('/')->assertResponseOk();
+    public function testUserCannotAddReviewIfNotAuthenticated()
+    {
+        $this->get('/')->assertResponseOk();
 
-    //     $url = str_replace(':id', 0, $this->apiV1ReviewsUrl);
-    //     $review = factory(Review::class)->make()->toArray();
-
-    //     $this->post($url, $review, ['Authorization' => 'Bearer ']);
-    //     print_r(['url' => $url, 'review' => $review, $this->response->getContent()]);
-    //     $this->seeStatusCode(401)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
-    // }
+        $this->post(str_replace(':id', 0, $this->apiV1ReviewsUrl), []);
+        $this->seeStatusCode(401)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+    }
 
     /**
      * @return void
@@ -44,7 +40,7 @@ class ReviewControllerTest extends TestCase
         $url = str_replace(':id', 0, $this->apiV1ReviewsUrl);
         $review = factory(Review::class)->make()->toArray();
 
-        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review, $this->userWithAuthorization['authorization'])->seeStatusCode(400);
+        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review)->seeStatusCode(400);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
@@ -58,7 +54,7 @@ class ReviewControllerTest extends TestCase
         $url = str_replace(':id', Specialist::first()->user_id, $this->apiV1ReviewsUrl);
         $review = factory(Review::class)->make(['remark' => ''])->toArray();
 
-        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review, $this->userWithAuthorization['authorization'])->seeStatusCode(400);
+        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review)->seeStatusCode(400);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
@@ -72,7 +68,7 @@ class ReviewControllerTest extends TestCase
         $url = str_replace(':id', Specialist::first()->user_id, $this->apiV1ReviewsUrl);
         $review = factory(Review::class)->make(['rating' => ''])->toArray();
 
-        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review, $this->userWithAuthorization['authorization'])->seeStatusCode(400);
+        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review)->seeStatusCode(400);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
@@ -87,7 +83,7 @@ class ReviewControllerTest extends TestCase
         $url = str_replace(':id', $specialist_user_id, $this->apiV1ReviewsUrl);
         $review = factory(Review::class)->make()->toArray();
 
-        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review, $this->userWithAuthorization['authorization']);
+        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review);
         $this->seeStatusCode(201)->seeJson(['status' => true])->seeInDatabase('reviews', [
             'specialist_id' => $specialist_user_id, 'remark' => $review['remark']
         ]);
@@ -105,7 +101,7 @@ class ReviewControllerTest extends TestCase
         $review = factory(Review::class)->make()->toArray();
 
         $nonPatient = factory(User::class)->make(['is_patient' => false]);
-        $this->actingAs($nonPatient)->post($url, $review, $this->userWithAuthorization['authorization']);
+        $this->actingAs($nonPatient)->post($url, $review);
         $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
