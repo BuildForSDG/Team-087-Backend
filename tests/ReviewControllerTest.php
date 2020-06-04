@@ -184,13 +184,10 @@ class ReviewControllerTest extends TestCase
         $this->get('/')->assertResponseOk();
 
         $specialistUserId = Specialist::first()->user_id;
-        $url = str_replace(':id', $specialistUserId, $this->apiV1ReviewsUrl);
         $patient = $this->get_user_with_authorization(['is_patient' => true]);
-
-        $specialistUserId = Specialist::first()->user_id;
         factory(Review::class)->create(['specialist_id' => $specialistUserId, 'patient_id' => $patient['user']->id]);
 
-        $this->actingAs($this->userWithAuthorization['user'])->get($url);
+        $this->actingAs($this->userWithAuthorization['user'])->get(str_replace(':id', $specialistUserId, $this->apiV1ReviewsUrl));
         $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['data' => [['id', 'remark', 'rating']]])->seeJsonDoesntContains(['errors']);
     }
 }

@@ -104,7 +104,7 @@ class AuthControllerTest extends TestCase
     {
         $this->get('/')->assertResponseStatus(200);
 
-        $user = User::where(['is_active' => false])->first();
+        $user = factory(User::class)->create();
         $this->get("{$this->apiV1VerifyUrl}?code={$user->profile_code}&email={$user->email}")->assertResponseStatus(200);
         $this->seeJson(['status' => true])->seeJsonStructure(['data', 'message'])->seeJsonDoesntContains(['errors']);
     }
