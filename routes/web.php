@@ -34,6 +34,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->get('appointments', ['uses' => 'AppointmentController@fetch', 'as' => 'appointments.fetch']);
         });
 
+        $router->get('', ['uses' => 'UserController@fetch', 'as' => 'users.fetch']);
         $router->get('appointments', ['uses' => 'AppointmentController@fetch', 'as' => 'appointments.fetch']);
     });
 });
