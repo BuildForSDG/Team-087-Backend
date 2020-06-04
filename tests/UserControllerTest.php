@@ -1,5 +1,8 @@
 <?php
 
+use App\Specialist;
+use App\User;
+
 /**
  * User Controller Test
  *
@@ -10,11 +13,37 @@ class UserControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->userWithAuthorization = $this->get_user_with_authorization();
     }
 
     public function testUserCanLoadHomePage()
     {
         $this->get('/')->assertResponseOk();
+    }
+
+    public function testUserCannotViewAllRegisteredUsersListIfNotAuthenticated()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $this->get($this->apiV1UsersUrl);
+        $this->seeStatusCode(401)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+    }
+
+    public function testUserCannotViewAllRegisteredUsersListIfNotAnAdministrator()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $nonAdministrator = factory(User::class)->create(['is_specialist' => true, 'is_admin' => false]);
+        $this->actingAs($nonAdministrator)->get($this->apiV1UsersUrl);
+        $this->seeStatusCode(401)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+    }
+
+    public function testUserCanViewAllRegisteredUsersListOnlyIfAnAdministrator()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $this->actingAs(factory(User::class)->create(['is_specialist' => false, 'is_admin' => true]))->get($this->apiV1UsersUrl);
+        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure([
+            'data' => [['id', 'last_name', 'first_name', 'created_at']]
+        ])->seeJsonDoesntContains(['errors']);
     }
 }
