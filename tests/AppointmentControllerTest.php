@@ -45,4 +45,44 @@ class AppointmentControllerTest extends TestCase
         $this->actingAs($this->userWithAuthorization['user'])->post($url, $appointment)->seeStatusCode(400);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
+
+    public function testAppointmentsForTheCurrentUserCanBeFetchedByThem()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $specialist = User::where(['is_specialist' => true])->firstOrNew();
+        $appointment = factory(Appointment::class)->create(['specialist_id' => $specialist->id, 'patient_id' => $this->userWithAuthorization['user']->id]);
+
+        $this->actingAs($this->userWithAuthorization['user'])->get(str_replace(':id/', '', $this->apiV1AppointmentsUrl));
+        $this->seeJson(['status' => true])->seeInDatabase('appointments', [
+            'id' => $appointment->id, 'purpose' => $appointment->purpose
+        ])->seeJsonStructure(['data' => [['id', 'purpose', 'created_at']]])->seeJsonDoesntContains(['errors']);
+    }
+
+    public function testAppointmentsForASpecialistCanBeFetchedByAnotherUser()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $patient = User::where(['is_patient' => true])->firstOrNew();
+        $specialist = User::where(['is_specialist' => true])->firstOrNew();
+        $appointment = factory(Appointment::class)->create(['specialist_id' => $specialist->id, 'patient_id' => $patient->id]);
+
+        $url = str_replace(':id', $specialist->id, $this->apiV1AppointmentsUrl);
+        $this->actingAs($this->userWithAuthorization['user'])->get(str_replace(':id', $specialist->id, $this->apiV1AppointmentsUrl));
+        $this->seeJson(['status' => true])->seeInDatabase('appointments', [
+            'id' => $appointment->id, 'purpose' => $appointment->purpose
+        ])->seeJsonStructure(['data' => [['id', 'purpose', 'created_at']]])->seeJsonDoesntContains(['errors']);
+    }
+
+    public function testAppointmentsForAPatientCannotBeFetchedByAnotherPatient()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $patient = User::where(['is_patient' => true])->first();
+        $specialist = User::where(['is_specialist' => true])->firstOrNew();
+        factory(Appointment::class)->create(['specialist_id' => $specialist->id, 'patient_id' => $patient->id]);
+
+        $this->actingAs($this->userWithAuthorization['user'])->get(str_replace(':id', $patient->id, $this->apiV1AppointmentsUrl));
+        $this->seeJson(['status' => true])->seeJsonStructure(['data' => []])->seeJsonDoesntContains(['errors']);
+    }
 }
