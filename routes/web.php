@@ -31,7 +31,10 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->get('reviews', ['uses' => 'ReviewController@view', 'as' => 'review.view']);
 
             $router->post('appointments', ['uses' => 'AppointmentController@book', 'as' => 'appointments.book']);
+            $router->get('appointments', ['uses' => 'AppointmentController@fetch', 'as' => 'appointments.fetch']);
         });
+
+        $router->get('appointments', ['uses' => 'AppointmentController@fetch', 'as' => 'appointments.fetch']);
     });
 });
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Appointment;
 use App\Specialist;
+use App\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -49,6 +50,21 @@ class AppointmentController extends Controller
         } catch (\Exception | ModelNotFoundException $e) {
             return response()->json([
                 'status' => false, 'message' => 'Appointment could not be saved', 'errors' => ['error' => $e->getMessage()]
+            ], ($e instanceof ModelNotFoundException ? 404 : 400));
+        }
+    }
+
+    public function fetch($id = 0)
+    {
+        try {
+            $userId = empty($id) ? auth()->user()->id : $id;
+            $user = User::findOrFail($userId);
+
+            $appointments = $user->is_patient ? $user->patient->appointments : ($user->is_specialist ? $user->specialist->appointments : Appointment::where(['specialist_id' => $id])->get());
+            return response()->json(['status' => true, 'data' => $appointments], 200);
+        } catch (\Exception | ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false, 'message' => 'Appointment(s) could not be fetched', 'errors' => ['error' => $e->getMessage()]
             ], ($e instanceof ModelNotFoundException ? 404 : 400));
         }
     }
