@@ -67,7 +67,6 @@ class AppointmentControllerTest extends TestCase
         $specialist = User::where(['is_specialist' => true])->firstOrNew();
         $appointment = factory(Appointment::class)->create(['specialist_id' => $specialist->id, 'patient_id' => $patient->id]);
 
-        $url = str_replace(':id', $specialist->id, $this->apiV1AppointmentsUrl);
         $this->actingAs($this->userWithAuthorization['user'])->get(str_replace(':id', $specialist->id, $this->apiV1AppointmentsUrl));
         $this->seeJson(['status' => true])->seeInDatabase('appointments', [
             'id' => $appointment->id, 'purpose' => $appointment->purpose
