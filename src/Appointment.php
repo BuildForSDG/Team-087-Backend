@@ -14,6 +14,8 @@ class Appointment extends Model
 
     protected $dates = ['starts_at', 'ends_at'];
 
+    protected $with = ['chats'];
+
     public function specialist()
     {
         return $this->belongsTo(Specialist::class);
@@ -22,6 +24,11 @@ class Appointment extends Model
     public function patient()
     {
         return $this->belongsTo(Patient::class);
+    }
+
+    public function chats()
+    {
+        return $this->hasMany(Chat::class);
     }
 
     public function visits()
