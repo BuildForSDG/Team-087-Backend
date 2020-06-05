@@ -181,6 +181,7 @@ class AuthControllerTest extends TestCase
         $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['access_token']);
 
         $this->actingAs($user)->post($this->apiV1SignOutUrl);
+        print($this->response->getContent());
         $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['message']);
     }
 
