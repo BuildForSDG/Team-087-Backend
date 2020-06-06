@@ -180,8 +180,7 @@ class AuthControllerTest extends TestCase
         $this->post($this->apiV1SignInUrl, ['email' => $user->email, 'password' => 'markspencer']);
         $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['access_token']);
 
-        $response = json_decode($this->response->getContent());
-        $this->actingAs($user)->post($this->apiV1SignOutUrl, [], ['Authorization' => "Bearer {$response->access_token}"]);
+        $this->actingAs($user)->post($this->apiV1SignOutUrl);
         $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['message']);
     }
 
