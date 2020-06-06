@@ -24,19 +24,19 @@ class UserController extends Controller
         try {
             $filters = [];
             if ($request->has('active')) {
-                $filters['is_active'] = boolval($request->query('active', 0));
+                $filters['is_active'] = (bool) ($request->query('active', 0));
             }
 
             if ($request->has('patient')) {
-                $filters['is_patient'] = boolval($request->query('patient', 0));
+                $filters['is_patient'] = (bool) ($request->query('patient', 0));
             }
 
             if ($request->has('specialist')) {
-                $filters['is_specialist'] = boolval($request->query('specialist', 0));
+                $filters['is_specialist'] = (bool) ($request->query('specialist', 0));
             }
 
             if ($request->has('admin')) {
-                $filters['is_admin'] = boolval($request->query('admin', 0));
+                $filters['is_admin'] = (bool) ($request->query('admin', 0));
             }
 
             $perPage = $request->query('chunk', 10); //chunk-size of fetched-data
@@ -46,7 +46,7 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false, 'message' => 'User(s) could not be fetched', 'errors' => ['error' => $e->getMessage()]
-            ],  400);
+            ], 400);
         }
     }
 }
