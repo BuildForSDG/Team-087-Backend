@@ -94,16 +94,14 @@ class ReviewController extends Controller
         }
     }
 
-    public function view($id)
+    public function fetch($id)
     {
         try {
             $user = auth()->user();
-            $specialistId = ($user->is_specialist) ? $user->id : $id;
+            $specialistId = ($user->is_specialist && !($user->is_patient || $user->is_admin)) ? $user->id : $id; // TODO: fix this issue
 
             $reviews = Review::where(['specialist_id' => $specialistId])->get();
-            return response()->json([
-                'status' => true, 'data' => $reviews
-            ]);
+            return response()->json(['status' => true, 'data' => $reviews]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false, 'message' => 'Review(s) could not be fetched',

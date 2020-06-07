@@ -57,4 +57,46 @@ class UserControllerTest extends TestCase
             ],
         ])->seeJsonDoesntContains(['errors']);
     }
+
+    public function testUsersCanViewTheirPersonalProfile()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $user = factory(User::class)->create(['is_patient' => false, 'is_specialist' => true]);
+        $this->actingAs($user)->get("{$this->apiV1UsersUrl}/me");
+        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['data' => ['id', 'last_name', 'created_at']])->seeJsonDoesntContains(['errors']);
+    }
+
+    public function testUserCannotViewAPatientProfileIfNotASpecialist()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $patient = factory(User::class)->create(['is_patient' => true, 'is_specialist' => false]);
+        $anotherPatient = factory(User::class)->create(['is_patient' => true, 'is_specialist' => false]);
+
+        $this->actingAs($patient)->get("{$this->apiV1UsersUrl}/{$anotherPatient->id}");
+        $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+    }
+
+    public function testUserCanViewASpecialistProfileWhetherOrNotASpecialist()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $patient = factory(User::class)->create(['is_patient' => true, 'is_specialist' => false]);
+        $specialist = factory(User::class)->create(['is_patient' => false, 'is_specialist' => true]);
+
+        $this->actingAs($patient)->get("{$this->apiV1UsersUrl}/{$specialist->id}");
+        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['data' => ['id', 'last_name', 'created_at']])->seeJsonDoesntContains(['errors']);
+    }
+
+    public function testUserCannotViewAdministrativeUserIfNotAFellowAdministrator()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $patient = factory(User::class)->create(['is_patient' => true, 'is_specialist' => false]);
+        $administrator = factory(User::class)->create(['is_patient' => false, 'is_specialist' => false, 'is_admin' => true]);
+
+        $this->actingAs($patient)->get("{$this->apiV1UsersUrl}/{$administrator->id}");
+        $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+    }
 }

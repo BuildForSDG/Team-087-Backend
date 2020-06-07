@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 /**
@@ -17,26 +18,26 @@ class UserController extends Controller
         if (!auth()->user()->is_admin) {
             return response()->json([
                 'status' => false, 'message' => 'User(s) could not be fetched',
-                'errors' => ['error' => "You don't have permission to do use this feature"]
+                'errors' => ['error' => "You cannot use this feature"]
             ], 401);
         }
 
         try {
             $filters = [];
             if ($request->has('active')) {
-                $filters['is_active'] = boolval($request->query('active', 0));
+                $filters['is_active'] = (bool) ($request->query('active', 0));
             }
 
             if ($request->has('patient')) {
-                $filters['is_patient'] = boolval($request->query('patient', 0));
+                $filters['is_patient'] = (bool) ($request->query('patient', 0));
             }
 
             if ($request->has('specialist')) {
-                $filters['is_specialist'] = boolval($request->query('specialist', 0));
+                $filters['is_specialist'] = (bool) ($request->query('specialist', 0));
             }
 
             if ($request->has('admin')) {
-                $filters['is_admin'] = boolval($request->query('admin', 0));
+                $filters['is_admin'] = (bool) ($request->query('admin', 0));
             }
 
             $perPage = $request->query('chunk', 10); //chunk-size of fetched-data
@@ -46,7 +47,46 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false, 'message' => 'User(s) could not be fetched', 'errors' => ['error' => $e->getMessage()]
-            ],  400);
+            ], 400);
+        }
+    }
+
+    public function view($id = 0)
+    {
+        try {
+            $authUser = auth()->user();
+            $viewedUser = User::findOrFail(empty($id) ? $authUser->id : $id);
+
+            if ($authUser->id !== $viewedUser->id) {
+                if (!$authUser->is_admin && $viewedUser->is_admin) {
+                    throw new \Exception("You cannot view this profile");
+                }
+
+                if ($authUser->is_patient && $viewedUser->is_patient) {
+                    throw new \Exception("You cannot view a patient as a patient");
+                }
+            }
+
+            $attachment = [];
+            if ($viewedUser->is_patient) {
+                $attachment = [
+                    'patient' => $viewedUser->patient,
+                    'appointments' => empty($viewedUser->patient) ? null : $viewedUser->patient->appointments
+                ];
+            } else if ($viewedUser->is_specialist) {
+                $attachment = [
+                    'specialist' => $viewedUser->specialist,
+                    'appointments' => empty($viewedUser->specialist) ? null : $viewedUser->specialist->appointments
+                ];
+            }
+
+            $viewedUserArray = array_merge($viewedUser->toArray(), $attachment);
+            return response()->json(['status' => true, 'data' => $viewedUserArray]);
+        } catch (\Exception | ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false, 'message' => 'User could not be retrieved',
+                'errors' => ['error' => $e->getMessage()]
+            ], ($e instanceof ModelNotFoundException ? 404 : 400));
         }
     }
 }
