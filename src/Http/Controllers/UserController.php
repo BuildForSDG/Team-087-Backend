@@ -55,16 +55,16 @@ class UserController extends Controller
     {
         try {
             $authUser = auth()->user();
+            $viewedUser = User::findOrFail(empty($id) ? $authUser->id : $id);
 
-            $userId = empty($id) ? $authUser->id : $id;
-            $viewedUser = User::findOrFail($userId);
+            if ($authUser->id !== $viewedUser->id) {
+                if (!$authUser->is_admin && $viewedUser->is_admin) {
+                    throw new \Exception("You cannot view this profile");
+                }
 
-            if (($authUser->id !== $viewedUser->id) && !$authUser->is_admin && $viewedUser->is_admin) {
-                throw new \Exception("You cannot view this profile");
-            }
-
-            if (($authUser->id !== $viewedUser->id) && ($authUser->is_patient && $viewedUser->is_patient)) {
-                throw new \Exception("You cannot view a patient as a patient");
+                if ($authUser->is_patient && $viewedUser->is_patient) {
+                    throw new \Exception("You cannot view a patient as a patient");
+                }
             }
 
             $attachment = [];
@@ -76,7 +76,7 @@ class UserController extends Controller
             } else if ($viewedUser->is_specialist) {
                 $attachment = [
                     'specialist' => $viewedUser->specialist,
-                    'appointments' => empty($viewedUser->specialist) ? null : $viewedUser->specialist->appointments,
+                    'appointments' => empty($viewedUser->specialist) ? null : $viewedUser->specialist->appointments
                 ];
             }
 
