@@ -15,7 +15,7 @@ class UserController extends Controller
 {
     public function fetch(Request $request)
     {
-        if (!auth()->user()->is_admin) {
+        if (!auth()->user()->is_admin && !($request->routeIs('users.recommend') && $request->input('byrr'))) {
             return response()->json([
                 'status' => false, 'message' => 'User(s) could not be fetched',
                 'errors' => ['error' => "You cannot use this feature"]
@@ -49,6 +49,21 @@ class UserController extends Controller
                 'status' => false, 'message' => 'User(s) could not be fetched', 'errors' => ['error' => $e->getMessage()]
             ], 400);
         }
+    }
+
+    /**
+     * Recommend a specialist to the current user [based on their location - W.I.P]
+     * (should work like a recommendation-engine for mental-health specialists like Youtube e.t.c)
+     * 
+     * @see https://medium.com/@sirajul.anik/laravel-lumen-manipulating-route-controller-parameters-5f3cbcb521b4
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function recommend(Request $request)
+    {
+        return $this->fetch($request->merge([
+            'specialist' => 1, 'active' => 1, 'patient' => 0, 'admin' => 0, 'byrr' => true // byrr => by-recommend-route
+        ]));
     }
 
     public function view($id = 0)
