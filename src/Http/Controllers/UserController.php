@@ -18,7 +18,7 @@ class UserController extends Controller
         if (!auth()->user()->is_admin) {
             return response()->json([
                 'status' => false, 'message' => 'User(s) could not be fetched',
-                'errors' => ['error' => "You don't have permission to do use this feature"]
+                'errors' => ['error' => "You cannot use this feature"]
             ], 401);
         }
 
