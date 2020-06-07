@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 /**
@@ -47,6 +48,45 @@ class UserController extends Controller
             return response()->json([
                 'status' => false, 'message' => 'User(s) could not be fetched', 'errors' => ['error' => $e->getMessage()]
             ], 400);
+        }
+    }
+
+    public function view($id = 0)
+    {
+        try {
+            $authUser = auth()->user();
+
+            $userId = empty($id) ? $authUser->id : $id;
+            $viewedUser = User::findOrFail($userId);
+
+            if (($authUser->id !== $viewedUser->id) && !$authUser->is_admin && $viewedUser->is_admin) {
+                throw new \Exception("You cannot view this profile");
+            }
+
+            if (($authUser->id !== $viewedUser->id) && ($authUser->is_patient && $viewedUser->is_patient)) {
+                throw new \Exception("You cannot view a patient as a patient");
+            }
+
+            $attachment = [];
+            if ($viewedUser->is_patient) {
+                $attachment = [
+                    'patient' => $viewedUser->patient,
+                    'appointments' => empty($viewedUser->patient) ? null : $viewedUser->patient->appointments
+                ];
+            } else if ($viewedUser->is_specialist) {
+                $attachment = [
+                    'specialist' => $viewedUser->specialist,
+                    'appointments' => empty($viewedUser->specialist) ? null : $viewedUser->specialist->appointments,
+                ];
+            }
+
+            $viewedUserArray = array_merge($viewedUser->toArray(), $attachment);
+            return response()->json(['status' => true, 'data' => $viewedUserArray]);
+        } catch (\Exception | ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false, 'message' => 'User could not be retrieved',
+                'errors' => ['error' => $e->getMessage()]
+            ], ($e instanceof ModelNotFoundException ? 404 : 400));
         }
     }
 }

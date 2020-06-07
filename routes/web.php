@@ -26,6 +26,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
     $router->group(['prefix' => 'users', 'middleware' => 'auth'], function () use ($router) {
         $router->get('appointments', ['uses' => 'AppointmentController@fetch', 'as' => 'appointments.fetch']);
+        $router->get('me', ['uses' => 'UserController@view', 'as' => 'users.view']);//personal-profile
 
         $router->group(['prefix' => '{id}'], function () use ($router) {
             $router->post('reviews', ['uses' => 'ReviewController@add', 'as' => 'reviews.add']);
