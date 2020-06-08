@@ -1,5 +1,6 @@
 <?php
 
+use App\Specialist;
 use App\User;
 
 /**
@@ -50,12 +51,9 @@ class UserControllerTest extends TestCase
         $this->get('/')->assertResponseOk();
 
         $this->actingAs(factory(User::class)->create(['is_specialist' => false, 'is_admin' => true]))->get("{$this->apiV1UsersUrl}?specialist=1");
-        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure([
-            'data' => [
-                'data' => [['id', 'last_name', 'first_name', 'created_at', 'specialist' => ['license_no', 'licensed_at']]],
-                'current_page', 'per_page', 'total'
-            ],
-        ])->seeJsonDoesntContains(['errors']);
+        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['data' => ['data' => [
+            ['id', 'last_name', 'first_name', 'created_at', 'specialist' => ['license_no', 'licensed_at']]
+        ], 'current_page', 'per_page', 'total']])->seeJsonDoesntContains(['errors']);
     }
 
     public function testUsersCanViewTheirPersonalProfile()
@@ -98,5 +96,20 @@ class UserControllerTest extends TestCase
 
         $this->actingAs($patient)->get("{$this->apiV1UsersUrl}/{$administrator->id}");
         $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+    }
+
+    public function testUserCanFetchSpecialistsRecommendationsForConsultationInPages()
+    {
+        $this->get('/')->assertResponseOk();
+
+        $patient = factory(User::class)->create(['is_patient' => true, 'is_specialist' => false]);
+        factory(User::class)->create([
+            'is_patient' => false, 'is_specialist' => true, 'is_active' => true
+        ])->specialist()->save(factory(Specialist::class)->make());
+
+        $this->actingAs($patient)->get("{$this->apiV1UsersUrl}/recommendations");
+        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['data' => ['data' => [
+            ['id', 'last_name', 'created_at', 'specialist' => ['license_no', 'licensed_at']]
+        ], 'current_page', 'per_page', 'total']])->seeJsonDoesntContains(['errors']);
     }
 }
