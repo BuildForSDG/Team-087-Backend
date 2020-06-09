@@ -72,9 +72,11 @@ $app->configure('app');
 |
 */
 
-// $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
-// ]);
+$app->middleware([
+    // App\Http\Middleware\ExampleMiddleware::class,
+    App\Http\Middleware\Cors::class, // handle CORS
+    App\Http\Middleware\ExecuteTimer::class, // handle request-execute-timer
+]);
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
