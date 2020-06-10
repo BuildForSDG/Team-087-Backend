@@ -1,7 +1,5 @@
 <?php
 
-define('LUMEN_START', microtime(true)); // to calculate execute-time
-
 /*
 |--------------------------------------------------------------------------
 | Create The Application

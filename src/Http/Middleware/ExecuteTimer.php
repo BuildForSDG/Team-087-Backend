@@ -16,7 +16,7 @@ class ExecuteTimer
     public function handle($request, Closure $next)
     {
         $response = $next($request);
-        $response->headers->set('X-Elapsed-Time', microtime(true) - LUMEN_START);
+        $response->headers->set('X-Elapsed-Time', round((microtime(true) - LUMEN_START), 2));
         return $response;
     }
 }
