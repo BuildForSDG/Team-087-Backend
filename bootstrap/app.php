@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('LUMEN_START')) {
+    define('LUMEN_START', microtime(true)); // to calculate execute-time
+}
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
@@ -72,9 +76,11 @@ $app->configure('app');
 |
 */
 
-// $app->middleware([
-//     App\Http\Middleware\ExampleMiddleware::class
-// ]);
+$app->middleware([
+    // App\Http\Middleware\ExampleMiddleware::class,
+    App\Http\Middleware\Cors::class, // handle CORS
+    App\Http\Middleware\ExecuteTimer::class, // handle request-execute-timer
+]);
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
