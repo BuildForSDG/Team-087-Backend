@@ -25,24 +25,24 @@ class UserController extends Controller
         try {
             $filters = [];
             if ($request->has('active')) {
-                $filters['is_active'] = (bool) ($request->query('active', 0));
+                $filters['is_active'] = (bool) ($request->input('active', 0));
             }
 
             if ($request->has('patient')) {
-                $filters['is_patient'] = (bool) ($request->query('patient', 0));
+                $filters['is_patient'] = (bool) ($request->input('patient', 0));
             }
 
             if ($request->has('specialist')) {
-                $filters['is_specialist'] = (bool) ($request->query('specialist', 0));
+                $filters['is_specialist'] = (bool) ($request->input('specialist', 0));
             }
 
             if ($request->has('admin')) {
-                $filters['is_admin'] = (bool) ($request->query('admin', 0));
+                $filters['is_admin'] = (bool) ($request->input('admin', 0));
             }
 
             $perPage = $request->query('chunk', 10); //chunk-size of fetched-data
             return response()->json([
-                'status' => true, 'data' => User::with(['patient', 'specialist'])->where($filters)->paginate($perPage)
+                'status' => true, 'data' => User::with(['patient', 'specialist'])->where($filters)->orderBy('id')->paginate($perPage)
             ]);
         } catch (\Exception $e) {
             return response()->json([
