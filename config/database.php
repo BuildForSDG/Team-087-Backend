@@ -6,6 +6,12 @@ return [
     'default' => env('DB_CONNECTION', 'mysql'),
 
     'connections' => [
+        'sqlite' => [
+            'driver' => 'sqlite',
+            'database' => env('DB_DATABASE', database_path('database.sqlite')),
+            'prefix' => env('DB_PREFIX', ''),
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'host' => $url['host'],
@@ -34,5 +40,7 @@ return [
             'schema' => env('DB_SCHEMA', 'public'),
             'sslmode' => env('DB_SSL_MODE', 'prefer'),
         ],
-    ]
+    ],
+
+    'migrations' => 'migrations',
 ];
