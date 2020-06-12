@@ -1,6 +1,6 @@
 <?php
 
-$url = parse_url(env('DATABASE_URL'));
+$url = parse_url(env('DATABASE_URL', "postgres://homestead:secret@127.0.0.1:5432/homestead"));
 
 return [
     'default' => env('DB_CONNECTION', 'mysql'),
