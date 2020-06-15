@@ -5,7 +5,6 @@ use Laravel\Lumen\Testing\DatabaseTransactions;
 
 /**
  * Auth Controller Test
- * @covers App\Http\AuthController
  * 
  * @author Emma NWAMAIFE <emadimabua@gmail.com>
  * @uses App\User

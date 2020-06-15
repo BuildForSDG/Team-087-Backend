@@ -55,7 +55,6 @@ The link to this project's postman collection will be provided at the end of the
 -   Start your local server running Apache/Nginx and Postgresql as the database-server
 -   Create a **database** and set its name to the value of the **`DB_DATABASE`** in your **`.env`** file within your project's root. (**_This is done on first-run ONLY_**)
 -   Run **`php artisan migrate`** to setup the tables used by the app within the database you just created. Additionally, if you will like to have sample data in the tables, you may append the `--seed` flag like so **`php artisan migrate --seed`**. (**_This is done on first-run ONLY_**)
-
 -   Access the app locally at `http://{SERVER-NAME-OR-IP}[:{PORT-NUMBER}]/` where `SERVER-NAME-OR-IP` is your local web-server IP/Name or virtual-host name (usually **_localhost_**) and `PORT-NUMBER` (optional) is the port-number on which your local web-server (i.e. Apache/Nginx) runs.
 
 ### Useful Hints
