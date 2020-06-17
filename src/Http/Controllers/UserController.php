@@ -104,4 +104,27 @@ class UserController extends Controller
             ], ($e instanceof ModelNotFoundException ? 404 : 400));
         }
     }
+
+    /**
+     * Edit Personal Photo
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function editPhoto(Request $request)
+    {
+        try {
+            $this->validate($request, ['photo_url' => 'required']);
+            User::find(auth()->user()->id)->update(['photo' => $request->input('photo_url')]);
+
+            return response()->json([
+                'status' => true, 'message' => 'Photo updated successfully', 'data' => $request->input()
+            ]);
+        } catch (\Exception | ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false, 'message' => "User could not be retrieved for photo-change",
+                'errors' => ['error' => $e->getMessage()]
+            ], ($e instanceof ModelNotFoundException ? 404 : 400));
+        }
+    }
 }

@@ -28,11 +28,13 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->get('appointments', ['uses' => 'AppointmentController@fetch', 'as' => 'appointments.fetch']);
 
         $router->get('me', ['uses' => 'UserController@view', 'as' => 'users.view']); //personal-profile
+        $router->put('photo', ['uses' => 'UserController@editPhoto', 'as' => 'users.edit.photo']); //edit-profile-photo
         $router->get('recommendations', ['uses' => 'UserController@recommend', 'as' => 'users.recommend']);
         
         $router->group(['prefix' => '{id}'], function () use ($router) {
             $router->post('reviews', ['uses' => 'ReviewController@add', 'as' => 'reviews.add']);
             $router->put('reviews/{reviewId}', ['uses' => 'ReviewController@edit', 'as' => 'reviews.edit']);
+            $router->delete('reviews/{reviewId}', ['uses' => 'ReviewController@delete', 'as' => 'reviews.delete']);
             $router->get('reviews', ['uses' => 'ReviewController@fetch', 'as' => 'reviews.fetch']);
 
             $router->post('appointments', ['uses' => 'AppointmentController@book', 'as' => 'appointments.book']);

@@ -94,6 +94,31 @@ class ReviewController extends Controller
         }
     }
 
+    public function delete($id, $reviewId)
+    {
+        try {
+            $user = auth()->user();
+            if (!$user->is_patient) {
+                abort(400, 'You cannot delete reviews as a non-patient');
+            }
+
+            $review = Review::with(['patient.user'])->where(['specialist_id' => $id])->findOrFail($reviewId);
+            if ($review->patient->user->id !== $user->id) {
+                abort(400, 'Review cannot be deleted by proxy');
+            }
+
+            $review->delete();
+
+            return response()->json([
+                'status' => true, 'message' => 'Review deleted successfully', 'data' => $review
+            ], 200);
+        } catch (\Exception | ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false, 'message' => 'Review could not be deleted', 'errors' => ['error' => $e->getMessage()]
+            ], ($e instanceof ModelNotFoundException ? 404 : 400));
+        }
+    }
+
     public function fetch($id)
     {
         try {
