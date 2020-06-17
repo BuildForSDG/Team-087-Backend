@@ -28,6 +28,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->get('appointments', ['uses' => 'AppointmentController@fetch', 'as' => 'appointments.fetch']);
 
         $router->get('me', ['uses' => 'UserController@view', 'as' => 'users.view']); //personal-profile
+        $router->put('photo', ['uses' => 'UserController@editPhoto', 'as' => 'users.edit.photo']); //edit-profile-photo
         $router->get('recommendations', ['uses' => 'UserController@recommend', 'as' => 'users.recommend']);
         
         $router->group(['prefix' => '{id}'], function () use ($router) {
