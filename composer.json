@@ -11,7 +11,9 @@
   },
   "require": {
     "laravel/lumen-framework": "^7.0",
-    "tymon/jwt-auth": "^1.0"
+    "tymon/jwt-auth": "^1.0",
+    "sendgrid/sendgrid": "^7.6",
+    "illuminate/mail": "^7.16"
   },
   "scripts": {
     "test": "phpunit --colors=always",

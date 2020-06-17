@@ -64,6 +64,14 @@ $app->singleton(
 */
 
 $app->configure('app');
+$app->configure('mail');
+
+$app->alias('mail.manager', Illuminate\Mail\MailManager::class);
+$app->alias('mail.manager', Illuminate\Contracts\Mail\Factory::class);
+
+$app->alias('mailer', Illuminate\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
+$app->alias('mailer', Illuminate\Contracts\Mail\MailQueue::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -77,7 +85,7 @@ $app->configure('app');
 */
 
 $app->middleware([
-    // App\Http\Middleware\ExampleMiddleware::class,
+    App\Http\Middleware\ExampleMiddleware::class,
     App\Http\Middleware\Cors::class, // handle CORS
     App\Http\Middleware\ExecuteTimer::class, // handle request-execute-timer
 ]);
@@ -101,6 +109,7 @@ $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
