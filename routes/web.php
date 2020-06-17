@@ -34,6 +34,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->group(['prefix' => '{id}'], function () use ($router) {
             $router->post('reviews', ['uses' => 'ReviewController@add', 'as' => 'reviews.add']);
             $router->put('reviews/{reviewId}', ['uses' => 'ReviewController@edit', 'as' => 'reviews.edit']);
+            $router->put('reviews/{reviewId}', ['uses' => 'ReviewController@delete', 'as' => 'reviews.delete']);
             $router->get('reviews', ['uses' => 'ReviewController@fetch', 'as' => 'reviews.fetch']);
 
             $router->post('appointments', ['uses' => 'AppointmentController@book', 'as' => 'appointments.book']);
