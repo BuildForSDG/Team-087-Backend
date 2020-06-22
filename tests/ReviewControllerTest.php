@@ -103,7 +103,7 @@ class ReviewControllerTest extends TestCase
 
         $nonPatient = factory(User::class)->make(['is_patient' => false]);
         $this->actingAs($nonPatient)->post($url, $review);
-        $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+        $this->seeStatusCode(403)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
     public function testReviewCannotBeEditedByADifferentAuthor()
