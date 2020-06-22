@@ -113,8 +113,9 @@ class UserController extends Controller
      */
     public function editPhoto(Request $request)
     {
+        $this->validate($request, ['photo_url' => 'required|url']);
+
         try {
-            $this->validate($request, ['photo_url' => 'required']);
             User::find(auth()->user()->id)->update(['photo' => $request->input('photo_url')]);
 
             return response()->json([

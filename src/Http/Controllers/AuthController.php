@@ -33,22 +33,22 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        // validate the incoming request
+        $this->validate($request, [
+            'last_name' => 'required|string',
+            'first_name' => 'required|string',
+            'gender' => 'required|in:male,female',
+            'email' => 'required|email|unique:users',
+            // 'marital_status' => 'required|in:single,married,divorced,complicated',
+            'password' => 'required|confirmed|min:8',
+            'is_patient' => 'required|boolean',
+        ], [
+            // 'in' => 'The :attribute must be one of the following: :values',
+            'is_patient.required' => "Kindly specify if you're a (prospective) patient"
+        ]);
+
+
         try {
-            // validate the incoming request
-            $this->validate($request, [
-                'last_name' => 'required|string',
-                'first_name' => 'required|string',
-                'gender' => 'required|in:male,female',
-                'email' => 'required|email|unique:users',
-                // 'marital_status' => 'required|in:single,married,divorced,complicated',
-                'password' => 'required|confirmed|min:8',
-                'is_patient' => 'required|boolean',
-            ], [
-                // 'in' => 'The :attribute must be one of the following: :values',
-                'is_patient.required' => "Kindly specify if you're a (prospective) patient"
-            ]);
-
-
             $user = new User();
             $user->last_name = $request->post('last_name');
             $user->first_name = $request->post('first_name');
@@ -69,10 +69,6 @@ class AuthController extends Controller
             return response()->json([
                 'status' => true, 'message' => 'Profile created successfully', 'data' => $user
             ], 201);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'status' => false, 'message' => $e->getMessage(), 'errors' => $e->errors()
-            ], 400);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false, 'message' => 'Profile creation failed', 'errors' => ['error' => $e->getMessage()]
