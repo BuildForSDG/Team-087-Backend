@@ -34,7 +34,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         // validate the incoming request
-        $this->validate($request, [
+        $data = $this->validate($request, [
             'last_name' => 'required|string',
             'first_name' => 'required|string',
             'gender' => 'required|in:male,female',
@@ -49,12 +49,7 @@ class AuthController extends Controller
 
 
         try {
-            $user = new User();
-            $user->last_name = $request->post('last_name');
-            $user->first_name = $request->post('first_name');
-            $user->gender = $request->post('gender');
-            $user->birth_date = $request->post('birth_date');
-            $user->email = $request->post('email');
+            $user = new User($data);
             $user->marital_status = $request->post('marital_status', 'single');
             $user->is_patient = $request->post('is_patient', true);
             $user->is_specialist = !$user->is_patient;
