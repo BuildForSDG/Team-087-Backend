@@ -188,6 +188,8 @@ class ReviewControllerTest extends TestCase
         factory(Review::class)->create(['specialist_id' => $specialistUserId, 'patient_id' => $patient['user']->id]);
 
         $this->actingAs($this->userWithAuthorization['user'])->get(str_replace(':id', $specialistUserId, $this->apiV1ReviewsUrl));
-        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure(['data' => [['id', 'remark', 'rating']]])->seeJsonDoesntContains(['errors']);
+        $this->seeStatusCode(200)->seeJson(['status' => true])->seeJsonStructure([
+            'data' => ['data' => [['id', 'remark', 'rating']]]
+        ])->seeJsonDoesntContains(['errors']);
     }
 }

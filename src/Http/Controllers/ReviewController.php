@@ -118,13 +118,14 @@ class ReviewController extends Controller
         }
     }
 
-    public function fetch($id = 0)
+    public function fetch(Request $request, $id = 0)
     {
         try {
             $user = auth()->user();
             $specialistId = ($user->is_specialist && !($user->is_patient || $user->is_admin)) ? $user->id : $id; // TODO: fix this issue
 
-            $reviews = Review::where(['specialist_id' => $specialistId])->get();
+            $perPage = $request->query('chunk', 10); //chunk-size of fetched-data
+            $reviews = Review::where(['specialist_id' => $specialistId])->paginate($perPage);
             return response()->json(['status' => true, 'data' => $reviews]);
         } catch (\Exception $e) {
             return response()->json([
