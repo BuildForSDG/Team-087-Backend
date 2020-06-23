@@ -55,7 +55,7 @@ class ReviewControllerTest extends TestCase
         $url = str_replace(':id', Specialist::first()->user_id, $this->apiV1ReviewsUrl);
         $review = factory(Review::class)->make(['remark' => ''])->toArray();
 
-        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review)->seeStatusCode(400);
+        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review)->seeStatusCode(422);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
@@ -69,7 +69,7 @@ class ReviewControllerTest extends TestCase
         $url = str_replace(':id', Specialist::first()->user_id, $this->apiV1ReviewsUrl);
         $review = factory(Review::class)->make(['rating' => ''])->toArray();
 
-        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review)->seeStatusCode(400);
+        $this->actingAs($this->userWithAuthorization['user'])->post($url, $review)->seeStatusCode(422);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
@@ -133,7 +133,7 @@ class ReviewControllerTest extends TestCase
         $review->remark = '';
 
         $this->actingAs($this->userWithAuthorization['user'])->put("{$url}/{$review->id}", $review->toArray());
-        $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+        $this->seeStatusCode(422)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
     public function testReviewCanOnlyBeEditedByItsOriginalAuthor()

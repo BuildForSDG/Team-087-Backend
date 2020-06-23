@@ -42,7 +42,7 @@ class AppointmentControllerTest extends TestCase
             'specialist_id' => $specialist->id, 'patient_id' => $this->userWithAuthorization['user']->id, 'purpose' => ''
         ])->toArray();
 
-        $this->actingAs($this->userWithAuthorization['user'])->post($url, $appointment)->seeStatusCode(400);
+        $this->actingAs($this->userWithAuthorization['user'])->post($url, $appointment)->seeStatusCode(422);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 

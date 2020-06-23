@@ -48,7 +48,7 @@ class AuthControllerTest extends TestCase
 
         $user = array_merge(User::first()->toArray(), ['password' => 'passw0rd', 'password_confirmation' => 'passw0rd']);
 
-        $this->json('POST', $this->apiV1RegisterUrl, $user)->assertResponseStatus(400);
+        $this->json('POST', $this->apiV1RegisterUrl, $user)->assertResponseStatus(422);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors' => ['email'], 'message'])->seeJsonDoesntContains(['data']);
     }
 
@@ -62,7 +62,7 @@ class AuthControllerTest extends TestCase
         $this->get('/')->assertResponseStatus(200);
 
         $user = ['last_name' => 'Meyer', 'first_name' => 'Jack', 'email' => 'mentalapp@', 'gender' => 'males'];
-        $this->post($this->apiV1RegisterUrl, $user)->assertResponseStatus(400);
+        $this->post($this->apiV1RegisterUrl, $user)->assertResponseStatus(422);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
