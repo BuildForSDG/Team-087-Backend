@@ -49,14 +49,16 @@ class AppointmentController extends Controller
         }
     }
 
-    public function fetch($id = 0)
+    public function fetch(Request $request, $id = 0)
     {
         try {
             $userId = empty($id) ? auth()->user()->id : $id;
             $user = User::findOrFail($userId);
 
-            $appointments = $user->is_patient ? $user->patient->appointments : ($user->is_specialist ? $user->specialist->appointments : Appointment::where(['specialist_id' => $id])->get());
-            return response()->json(['status' => true, 'data' => $appointments], 200);
+            $appointments = empty($id) ? collect([]) : Appointment::where(['specialist_id' => $id])->get();
+            $appointments = $user->is_patient ? $user->patient->appointments : ($user->is_specialist ? $user->specialist->appointments : $appointments);
+
+            return response()->json(['status' => true, 'data' => $appointments->paginate($request->input('chunk', 10))], 200);
         } catch (\Exception | ModelNotFoundException $e) {
             return response()->json([
                 'status' => false, 'message' => 'Appointment(s) could not be fetched', 'errors' => ['error' => $e->getMessage()]
