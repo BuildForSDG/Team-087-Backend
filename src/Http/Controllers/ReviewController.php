@@ -6,7 +6,6 @@ use App\Review;
 use App\Specialist;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 /**
  * Review Controller
@@ -17,19 +16,21 @@ class ReviewController extends Controller
 {
     public function add(Request $request, $id)
     {
+        $user = auth()->user();
+        if (!$user->is_patient) {
+            return response()->json([
+                'status' => false, 'message' => 'Review could not be saved',
+                'errors' => ['error' => 'You cannot give reviews as a non-patient']
+            ], 403);
+        }
+
+        $data = $this->validate($request, [
+            //'patient_id' => 'required|numeric|exists:App\Patient,user_id',
+            'remark' => 'required|string|max:160',
+            'rating' => 'required|numeric|between:0.5,5.0'
+        ]);
+
         try {
-            $user = auth()->user();
-            if (!$user->is_patient) {
-                abort(400, 'You cannot give reviews as a non-patient');
-            }
-
-            $data = $this->validate($request, [
-                //'patient_id' => 'required|numeric|exists:App\Patient,user_id',
-                'remark' => 'required|string|max:160',
-                'rating' => 'required|numeric|between:0.5,5.0'
-            ]);
-
-
             $specialist = Specialist::findOrFail($id);
             if (empty($specialist)) {
                 throw new ModelNotFoundException("Specialist could not be found");
@@ -44,10 +45,6 @@ class ReviewController extends Controller
             return response()->json([
                 'status' => true, 'message' => 'Review saved successfully', 'data' => $review
             ], 201);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'status' => false, 'message' => $e->getMessage(), 'errors' => $e->errors()
-            ], 400);
         } catch (\Exception | ModelNotFoundException $e) {
             return response()->json([
                 'status' => false, 'message' => 'Review could not be saved', 'errors' => ['error' => $e->getMessage()]
@@ -57,23 +54,26 @@ class ReviewController extends Controller
 
     public function edit(Request $request, $id, $reviewId)
     {
+        $user = auth()->user();
+        if (!$user->is_patient) {
+            return response()->json([
+                'status' => false, 'message' => 'Review could not be updated',
+                'errors' => ['error' => 'You cannot edit reviews as a non-patient']
+            ], 403);
+        }
+
+        $data = $this->validate($request, [
+            'remark' => 'required|string|max:160', 'rating' => 'required|numeric|between:0.5,5.0'
+        ]);
+
         try {
-            $user = auth()->user();
-            if (!$user->is_patient) {
-                abort(400, 'You cannot edit reviews as a non-patient');
-            }
-
-            $data = $this->validate($request, [
-                'remark' => 'required|string|max:160', 'rating' => 'required|numeric|between:0.5,5.0'
-            ]);
-
             $review = Review::with(['patient.user'])->where(['specialist_id' => $id])->findOrFail($reviewId);
             // if (empty($review)) {
             //     abort(404, 'Review does not exist');
             // }
 
             if ($review->patient->user->id !== $user->id) {
-                abort(400, 'Review cannot be edited by proxy');
+                abort(403, 'Review cannot be edited by proxy');
             }
 
             $review->remark = $data['remark'];
@@ -83,10 +83,6 @@ class ReviewController extends Controller
             return response()->json([
                 'status' => true, 'message' => 'Review updated successfully', 'data' => $review
             ], 200);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'status' => false, 'message' => $e->getMessage(), 'errors' => $e->errors()
-            ], 400);
         } catch (\Exception | ModelNotFoundException $e) {
             return response()->json([
                 'status' => false, 'message' => 'Review could not be updated', 'errors' => ['error' => $e->getMessage()]
@@ -96,15 +92,18 @@ class ReviewController extends Controller
 
     public function delete($id, $reviewId)
     {
-        try {
-            $user = auth()->user();
-            if (!$user->is_patient) {
-                abort(400, 'You cannot delete reviews as a non-patient');
-            }
+        $user = auth()->user();
+        if (!$user->is_patient) {
+            return response()->json([
+                'status' => false, 'message' => 'Review could not be deleted',
+                'errors' => ['error' => 'You cannot delete reviews as a non-patient']
+            ], 403);
+        }
 
+        try {
             $review = Review::with(['patient.user'])->where(['specialist_id' => $id])->findOrFail($reviewId);
             if ($review->patient->user->id !== $user->id) {
-                abort(400, 'Review cannot be deleted by proxy');
+                abort(403, 'Review cannot be deleted by proxy');
             }
 
             $review->delete();
@@ -119,13 +118,14 @@ class ReviewController extends Controller
         }
     }
 
-    public function fetch($id)
+    public function fetch(Request $request, $id = 0)
     {
         try {
             $user = auth()->user();
             $specialistId = ($user->is_specialist && !($user->is_patient || $user->is_admin)) ? $user->id : $id; // TODO: fix this issue
 
-            $reviews = Review::where(['specialist_id' => $specialistId])->get();
+            $perPage = $request->query('chunk', 10); //chunk-size of fetched-data
+            $reviews = Review::where(['specialist_id' => $specialistId])->paginate($perPage);
             return response()->json(['status' => true, 'data' => $reviews]);
         } catch (\Exception $e) {
             return response()->json([

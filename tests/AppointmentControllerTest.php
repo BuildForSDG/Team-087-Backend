@@ -42,7 +42,7 @@ class AppointmentControllerTest extends TestCase
             'specialist_id' => $specialist->id, 'patient_id' => $this->userWithAuthorization['user']->id, 'purpose' => ''
         ])->toArray();
 
-        $this->actingAs($this->userWithAuthorization['user'])->post($url, $appointment)->seeStatusCode(400);
+        $this->actingAs($this->userWithAuthorization['user'])->post($url, $appointment)->seeStatusCode(422);
         $this->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
@@ -56,7 +56,7 @@ class AppointmentControllerTest extends TestCase
         $this->actingAs($this->userWithAuthorization['user'])->get(str_replace(':id/', '', $this->apiV1AppointmentsUrl));
         $this->seeJson(['status' => true])->seeInDatabase('appointments', [
             'id' => $appointment->id, 'purpose' => $appointment->purpose
-        ])->seeJsonStructure(['data' => [['id', 'purpose', 'created_at']]])->seeJsonDoesntContains(['errors']);
+        ])->seeJsonStructure(['data' => ['data' => [['id', 'purpose', 'created_at']]]])->seeJsonDoesntContains(['errors']);
     }
 
     public function testAppointmentsForASpecialistCanBeFetchedByAnotherUser()
@@ -70,7 +70,7 @@ class AppointmentControllerTest extends TestCase
         $this->actingAs($this->userWithAuthorization['user'])->get(str_replace(':id', $specialist->id, $this->apiV1AppointmentsUrl));
         $this->seeJson(['status' => true])->seeInDatabase('appointments', [
             'id' => $appointment->id, 'purpose' => $appointment->purpose
-        ])->seeJsonStructure(['data' => [['id', 'purpose', 'created_at']]])->seeJsonDoesntContains(['errors']);
+        ])->seeJsonStructure(['data' => ['data' => [['id', 'purpose', 'created_at']]]])->seeJsonDoesntContains(['errors']);
     }
 
     public function testAppointmentsForAPatientCannotBeFetchedByAnotherPatient()

@@ -33,7 +33,7 @@ class UserControllerTest extends TestCase
         $this->get('/')->assertResponseOk();
 
         $this->actingAs(factory(User::class)->create(['is_specialist' => true, 'is_admin' => false]))->get($this->apiV1UsersUrl);
-        $this->seeStatusCode(401)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
+        $this->seeStatusCode(403)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])->seeJsonDoesntContains(['data']);
     }
 
     public function testUserCanViewAllRegisteredUsersListOnlyIfAnAdministrator()

@@ -19,7 +19,7 @@ class UserController extends Controller
             return response()->json([
                 'status' => false, 'message' => 'User(s) could not be fetched',
                 'errors' => ['error' => "You cannot use this feature"]
-            ], 401);
+            ], 403);
         }
 
         try {
@@ -74,11 +74,11 @@ class UserController extends Controller
 
             if ($authUser->id !== $viewedUser->id) {
                 if (!$authUser->is_admin && $viewedUser->is_admin) {
-                    throw new \Exception("You cannot view this profile");
+                    abort(403, "You cannot view this profile");
                 }
 
                 if ($authUser->is_patient && $viewedUser->is_patient) {
-                    throw new \Exception("You cannot view a patient as a patient");
+                    abort(403, "You cannot view a patient as a patient");
                 }
             }
 
@@ -113,8 +113,9 @@ class UserController extends Controller
      */
     public function editPhoto(Request $request)
     {
+        $this->validate($request, ['photo_url' => 'required|url']);
+
         try {
-            $this->validate($request, ['photo_url' => 'required']);
             User::find(auth()->user()->id)->update(['photo' => $request->input('photo_url')]);
 
             return response()->json([
