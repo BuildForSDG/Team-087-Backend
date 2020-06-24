@@ -16,14 +16,14 @@ jobs:
     name: codacy-coverage-reporter
     steps:
       - uses: actions/checkout@master
-      - name: Install Composer [Composer (php-actions)]
+      - name: Install Composer Dependencies #[Composer (php-actions)]
         uses: php-actions/composer@v1
         with: # Composer command to run
           command: install # default is install
-      - name: Run Coverage Test
+      - name: Run PHPUnit Coverage Test
         uses: php-actions/composer@v1
         with:
-          command: test -- --verbose --coverage-text --coverage-clover=coverage.xml
+          run: composer test -- --verbose --coverage-text --coverage-clover=coverage.xml
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@master
         with:
