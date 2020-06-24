@@ -9,7 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail as MailFacade;
 use SendGrid;
-use SendGrid\Mail\{From, To, Content, Mail};
+use SendGrid\Mail\{Content, From, Mail, To};
 
 class UserRegisteredListener
 {
