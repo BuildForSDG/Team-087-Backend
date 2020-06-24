@@ -39,7 +39,7 @@ class UserVerify extends Mailable
         $appName = env('APP_NAME', 'MH-87');
         $permittedFEs = explode(',', env('APP_FRONTEND_URL'));
 
-        return $this->bcc('emadimabua@gmail.com', 'Emma')->subject("[$appName] Welcome on-board!")->view('email.user.verify', [
+        return $this->bcc(env('MAIL_BCC_ADDRESS'), 'Emma')->subject("[$appName] Welcome on-board!")->view('email.user.verify', [
             'appName' => $appName,
             'firstName' => $this->user->first_name,
             'code' => $this->user->profile_code,
