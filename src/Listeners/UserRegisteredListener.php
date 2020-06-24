@@ -43,7 +43,7 @@ class UserRegisteredListener
             @mail($event->user->email, $subject, $messageBody, []);
         } else {
             try {
-                $from = new From("noreply@mental-lyf-staging.netlify.app", "Support");
+                $from = new From(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
                 $to = new To($event->user->email, $event->user->first_name);
                 $content = new Content("text/plain", $messageBody);
                 $mail = new Mail($from, $to, $subject, $content);
