@@ -20,9 +20,9 @@ jobs:
         uses: php-actions/composer@v1
         with: # Composer command to run
           command: install # default is install
-      - name: Run PHPUnit Coverage Test
+      #- name: Run PHPUnit Coverage Test
         #uses: php-actions/composer@v1
-        run: composer test -- --verbose --coverage-text --coverage-clover=/.github/workflows/coverage.xml
+        #run: composer test -- --verbose --coverage-text --coverage-clover=/.github/workflows/coverage.xml
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@master
         with:
