@@ -23,7 +23,7 @@ jobs:
       - name: Run Coverage Test
         uses: php-actions/composer@v1
         with:
-          command: run test:ci
+          command: test -- --verbose --coverage-text --coverage-clover=coverage.xml
       - name: Run codacy-coverage-reporter
         uses: codacy/codacy-coverage-reporter-action@master
         with:
