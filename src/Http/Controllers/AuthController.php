@@ -79,7 +79,7 @@ class AuthController extends Controller
      */
     public function verify(Request $request)
     {
-        $user = User::where(['profile_code' => $request->query('code')])->first();
+        $user = User::with(['patient', 'specialist'])->where(['profile_code' => $request->query('code')])->first();
         if (empty($user)) {
             return response()->json([
                 'status' => false, 'message' => 'User verification failed',
@@ -101,7 +101,7 @@ class AuthController extends Controller
             ], 400);
         }
 
-        if ($user->is_patient) {
+        if ($user->is_patient && empty($user->patient)) {
             factory(Patient::class)->create(['user_id' => $user->id]);
         }
 
