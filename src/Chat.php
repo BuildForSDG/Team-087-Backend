@@ -10,6 +10,8 @@ class Chat extends Model
         'appointment_id', 'message', 'user_id', 'chat_id'
     ];
 
+    protected $with = ['user'];
+
     public function appointment()
     {
         return $this->belongsTo(Appointment::class);

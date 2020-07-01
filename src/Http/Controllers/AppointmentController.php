@@ -7,7 +7,7 @@ use App\Specialist;
 use App\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+// use Illuminate\Validation\Rule;
 
 /**
  * Appointment Controller
@@ -24,13 +24,13 @@ class AppointmentController extends Controller
         $data = $this->validate($request, [
             // 'patient_id' => Rule::requiredIf(!$isPatient),
             'purpose' => 'required|string|max:160',
-            'starts_at' => 'required',// date_format:Y-m-d H:i:s
-            'ends_at' => 'required'// date_format:Y-m-d H:i:s
+            'starts_at' => 'required', // date_format:Y-m-d H:i:s
+            'ends_at' => 'required' // date_format:Y-m-d H:i:s
         ]);
 
         try {
             $specialistId = $isPatient ? $id : $user->id;
-            $patientId = $isPatient ? $user->id : $id;// $data['patient_id']
+            $patientId = $isPatient ? $user->id : $id; // $data['patient_id']
 
             Specialist::findOrFail($specialistId);
 
@@ -45,6 +45,20 @@ class AppointmentController extends Controller
         } catch (\Exception | ModelNotFoundException $e) {
             return response()->json([
                 'status' => false, 'message' => 'Appointment could not be saved', 'errors' => ['error' => $e->getMessage()]
+            ], ($e instanceof ModelNotFoundException ? 404 : 400));
+        }
+    }
+
+    public function view($id)
+    {
+        try {
+            $userId = auth()->user()->id;
+            $appointment = Appointment::where('specialist_id', $userId)->orWhere('patient_id', $userId)->findOrFail($id);
+
+            return response()->json(['status' => true, 'data' => $appointment]);
+        } catch (\Exception | ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false, 'message' => 'Appointment could not be retrieved', 'errors' => ['error' => $e->getMessage()]
             ], ($e instanceof ModelNotFoundException ? 404 : 400));
         }
     }
