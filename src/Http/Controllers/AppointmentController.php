@@ -22,15 +22,15 @@ class AppointmentController extends Controller
         $isPatient = $user->is_patient;
 
         $data = $this->validate($request, [
-            'patient_id' => Rule::requiredIf(!$isPatient),
+            // 'patient_id' => Rule::requiredIf(!$isPatient),
             'purpose' => 'required|string|max:160',
-            'starts_at' => 'required|date_format:Y-m-d H:i:s',
-            'ends_at' => 'required|date_format:Y-m-d H:i:s'
+            'starts_at' => 'required',// date_format:Y-m-d H:i:s
+            'ends_at' => 'required'// date_format:Y-m-d H:i:s
         ]);
 
         try {
             $specialistId = $isPatient ? $id : $user->id;
-            $patientId = $isPatient ? $user->id : $data['patient_id'];
+            $patientId = $isPatient ? $user->id : $id;// $data['patient_id']
 
             Specialist::findOrFail($specialistId);
 
