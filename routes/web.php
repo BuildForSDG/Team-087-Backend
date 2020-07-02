@@ -26,6 +26,9 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
     $router->group(['prefix' => 'users', 'middleware' => 'auth'], function () use ($router) {
         $router->get('appointments', ['uses' => 'AppointmentController@fetch', 'as' => 'appointments.fetch']);
+        $router->get('appointments/{id}', ['uses' => 'AppointmentController@view', 'as' => 'appointments.view']);
+        $router->post('appointments/{id}', ['uses' => 'ChatController@add', 'as' => 'chats.add']);
+
         $router->get('reviews', ['uses' => 'ReviewController@fetch', 'as' => 'reviews.fetch']);
 
         $router->get('me', ['uses' => 'UserController@view', 'as' => 'users.view']); //personal-profile

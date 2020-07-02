@@ -130,7 +130,7 @@ class AuthController extends Controller
             if (!($token = auth()->attempt($credentials))) {
                 return response()->json([
                     'status' => false, 'message' => 'Authentication failed', 'errors' => ['error' => 'Invalid email-address/password']
-                ], 401);
+                ], 400);
             }
 
             return $this->respondWithToken($token);

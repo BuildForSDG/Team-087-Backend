@@ -162,7 +162,7 @@ class AuthControllerTest extends TestCase
         $this->get('/')->assertResponseStatus(200);
 
         $this->post($this->apiV1SignInUrl, ['email' => factory(User::class)->create()->email, 'password' => 'markspencer']);
-        $this->seeStatusCode(401)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])
+        $this->seeStatusCode(400)->seeJson(['status' => false])->seeJsonStructure(['errors', 'message'])
             ->seeJsonDoesntContains(['data']);
     }
 
