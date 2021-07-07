@@ -1,0 +1,31 @@
+#- name: Codacy Coverage Reporter
+  #uses: codacy/codacy-coverage-reporter-action@0.2.0
+  #with:
+    # Project token for the Codacy project you want to send coverage information
+    #project-token: 
+    # Optional comma separated list of coverage reports to send to Codacy
+    # coverage-reports: # optional, default is 
+    
+name: codacy-coverage-reporter
+
+on: ["push"]
+
+jobs:
+  codacy-coverage-reporter:
+    runs-on: ubuntu-latest
+    name: codacy-coverage-reporter
+    steps:
+      - uses: actions/checkout@master
+      - name: Install Composer Dependencies #[Composer (php-actions)]
+        uses: php-actions/composer@v1
+        with: # Composer command to run
+          command: install # default is install
+      #- name: Run PHPUnit Coverage Test
+        #uses: php-actions/composer@v1
+        #run: composer test -- --verbose --coverage-text --coverage-clover=/.github/workflows/coverage.xml
+      - name: Run codacy-coverage-reporter
+        uses: codacy/codacy-coverage-reporter-action@master
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: clover.xml
+          args: final
